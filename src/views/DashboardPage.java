@@ -1,4 +1,4 @@
-package raven.forms;
+package views;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import java.awt.BorderLayout;
@@ -18,16 +18,12 @@ import raven.chart.data.category.DefaultCategoryDataset;
 import raven.chart.data.pie.DefaultPieDataset;
 import raven.chart.line.LineChart;
 import raven.chart.pie.PieChart;
-import raven.components.SimpleForm;
-import raven.utils.DateCalculator;
+import ui.components.SimpleForm;
+import utils.DateCalculator;
 
-/**
- *
- * @author Raven
- */
-public class DashboardForm extends SimpleForm {
+public class DashboardPage extends SimpleForm {
 
-    public DashboardForm() {
+    public DashboardPage() {
         init();
     }
 
@@ -43,12 +39,12 @@ public class DashboardForm extends SimpleForm {
 
     @Override
     public void formInitAndOpen() {
-        System.out.println("init and open");
+        
     }
 
     @Override
     public void formOpen() {
-        System.out.println("Open");
+        
     }
 
     private void init() {

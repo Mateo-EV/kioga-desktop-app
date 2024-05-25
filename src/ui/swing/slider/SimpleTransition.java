@@ -1,4 +1,4 @@
-package raven.swing.slider;
+package ui.swing.slider;
 
 import com.formdev.flatlaf.ui.FlatUIUtils;
 import com.formdev.flatlaf.util.UIScale;
@@ -13,10 +13,6 @@ import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.UIManager;
 
-/**
- *
- * @author Raven
- */
 public class SimpleTransition {
 
     private static final float ZOOM_IN = 0.1f;

@@ -1,13 +1,8 @@
-package raven.utils;
+package utils;
 
 import java.util.Iterator;
 import java.util.Stack;
 
-/**
- *
- * @author Raven
- * @param <E>
- */
 public class UndoRedo<E> implements Iterable<E> {
 
     private final Stack<E> stack1;
@@ -46,7 +41,7 @@ public class UndoRedo<E> implements Iterable<E> {
         if (stack1.isEmpty()) {
             return null;
         } else {
-            return stack1.get(stack1.size() - 1);
+            return stack1.peek();
         }
     }
 

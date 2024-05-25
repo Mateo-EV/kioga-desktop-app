@@ -1,4 +1,4 @@
-package raven.login;
+package views;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import javax.swing.JButton;
@@ -8,16 +8,12 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import net.miginfocom.swing.MigLayout;
-import raven.menu.FormManager;
-import raven.model.ModelUser;
+import ui.menu.FormManager;
+import models.UserModel;
 
-/**
- *
- * @author Raven
- */
-public class Login extends JPanel {
+public class LoginPage extends JPanel {
 
-    public Login() {
+    public LoginPage() {
         init();
     }
 
@@ -45,7 +41,7 @@ public class Login extends JPanel {
         txtUsername.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your username or email");
         txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your password");
 
-        JLabel lbTitle = new JLabel("Welcome back!");
+        JLabel lbTitle = new JLabel("KIOGA");
         JLabel description = new JLabel("Please sign in to access your account");
         lbTitle.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:bold +10");
@@ -68,7 +64,7 @@ public class Login extends JPanel {
             String userName = txtUsername.getText().trim();
             // this is just for example to check admin user :)
             boolean isAdmin = userName.equals("admin");
-            FormManager.login(new ModelUser(userName, isAdmin));
+            FormManager.login(new UserModel(userName, isAdmin));
         });
     }
 

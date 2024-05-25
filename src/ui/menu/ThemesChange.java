@@ -1,4 +1,4 @@
-package raven.menu;
+package ui.menu;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
@@ -13,10 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
-/**
- *
- * @author Raven
- */
 public class ThemesChange extends JPanel {
 
     public ThemesChange() {
@@ -39,8 +35,8 @@ public class ThemesChange extends JPanel {
         panel.putClientProperty(FlatClientProperties.STYLE, ""
                 + "arc:999;"
                 + "background:darken($Drawer.background,5%)");
-        JButton buttonLight = new JButton(createIcon("raven/resources/icon/light.svg"));
-        JButton buttonDark = new JButton(createIcon("raven/resources/icon/dark.svg"));
+        JButton buttonLight = new JButton(createIcon("resources/icon/light.svg"));
+        JButton buttonDark = new JButton(createIcon("resources/icon/dark.svg"));
         buttonLight.addActionListener(e -> changeMode(false));
         buttonDark.addActionListener(e -> changeMode(true));
         buttonLight.putClientProperty(FlatClientProperties.STYLE, ""

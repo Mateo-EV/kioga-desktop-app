@@ -1,21 +1,18 @@
-package raven.menu;
+package ui.menu;
 
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 import java.awt.Image;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import raven.components.MainForm;
-import raven.components.SimpleForm;
-import raven.login.Login;
-import raven.model.ModelUser;
-import raven.swing.slider.PanelSlider;
-import raven.swing.slider.SimpleTransition;
-import raven.utils.UndoRedo;
+import ui.components.MainForm;
+import ui.components.SimpleForm;
+import views.LoginPage;
+import models.UserModel;
+import ui.swing.slider.PanelSlider;
+import ui.swing.slider.SimpleTransition;
+import utils.UndoRedo;
+import views.DashboardPage;
 
-/**
- *
- * @author Raven
- */
 public class FormManager {
 
     private static FormManager instance;
@@ -37,7 +34,7 @@ public class FormManager {
         this.frame = frame;
         panelSlider = new PanelSlider();
         mainForm = new MainForm(undecorated);
-        menu = new Menu(new MyDrawerBuilder());
+        menu = new Menu(new DrawerBuilder());
         this.undecorated = undecorated;
     }
 
@@ -45,11 +42,23 @@ public class FormManager {
         instance.menuShowing = true;
         instance.panelSlider.addSlide(instance.menu, SimpleTransition.getShowMenuTransition(instance.menu.getDrawerBuilder().getDrawerWidth(), instance.undecorated));
     }
+    
+    public static void init() {
+        logout();
+        showForm(new DashboardPage());
+    }
 
     public static void showForm(SimpleForm component) {
         if (isNewFormAble()) {
+            if(instance.forms.getCurrent() != null && instance.forms.getCurrent().getClass().getSimpleName().equals(component.getClass().getSimpleName())){
+                instance.menuShowing = false;
+                Image oldImage = instance.panelSlider.createOldImage();
+                instance.panelSlider.addSlide(instance.mainForm, SimpleTransition.getSwitchFormTransition(oldImage, instance.menu.getDrawerBuilder().getDrawerWidth()));
+                return;
+            };
+            
             instance.forms.add(component);
-            if (instance.menuShowing == true) {
+            if (instance.menuShowing) {
                 instance.menuShowing = false;
                 Image oldImage = instance.panelSlider.createOldImage();
                 instance.mainForm.setForm(component);
@@ -64,18 +73,19 @@ public class FormManager {
     public static void logout() {
         FlatAnimatedLafChange.showSnapshot();
         instance.frame.getContentPane().removeAll();
-        instance.frame.getContentPane().add(new Login());
+        instance.frame.getContentPane().add(new LoginPage());
         instance.frame.repaint();
         instance.frame.revalidate();
         FlatAnimatedLafChange.hideSnapshotWithAnimation();
     }
 
-    public static void login(ModelUser user) {
+    public static void login(UserModel user) {
         FlatAnimatedLafChange.showSnapshot();
+        
         instance.frame.getContentPane().removeAll();
         instance.frame.getContentPane().add(instance.panelSlider);
         // set new user and rebuild menu for user role
-        ((MyDrawerBuilder) instance.menu.getDrawerBuilder()).setUser(user);
+        ((DrawerBuilder) instance.menu.getDrawerBuilder()).setUser(user);
         instance.frame.repaint();
         instance.frame.revalidate();
         FlatAnimatedLafChange.hideSnapshotWithAnimation();

@@ -1,10 +1,6 @@
-package raven.model;
+package models;
 
-/**
- *
- * @author Raven
- */
-public class ModelUser {
+public class UserModel {
 
     public String getUserName() {
         return userName;
@@ -22,12 +18,12 @@ public class ModelUser {
         this.admin = admin;
     }
 
-    public ModelUser(String userName, boolean admin) {
+    public UserModel(String userName, boolean admin) {
         this.userName = userName;
         this.admin = admin;
     }
 
-    public ModelUser() {
+    public UserModel() {
     }
 
     private String userName;

@@ -1,4 +1,4 @@
-package raven.swing.slider;
+package ui.swing.slider;
 
 import com.formdev.flatlaf.util.Animator;
 import com.formdev.flatlaf.util.CubicBezierEasing;
@@ -11,10 +11,6 @@ import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.SwingUtilities;
 
-/**
- *
- * @author Raven
- */
 public class PanelSlider extends JLayeredPane {
 
     private PanelSnapshot panelSnapshot;

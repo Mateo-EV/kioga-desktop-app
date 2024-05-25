@@ -1,14 +1,10 @@
-package raven.utils;
+package utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- * @author Raven
- */
 public class DateCalculator {
 
     public Date getDateStart() {

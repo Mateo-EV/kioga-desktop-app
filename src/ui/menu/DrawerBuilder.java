@@ -1,4 +1,4 @@
-package raven.menu;
+package ui.menu;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
@@ -20,27 +20,23 @@ import raven.drawer.component.menu.SimpleMenuOption;
 import raven.drawer.component.menu.SimpleMenuStyle;
 import raven.drawer.component.menu.data.Item;
 import raven.drawer.component.menu.data.MenuItem;
-import raven.forms.DashboardForm;
-import raven.forms.InboxForm;
-import raven.forms.ReadForm;
-import raven.model.ModelUser;
+import views.DashboardPage;
+import views.InboxPage;
+import views.ReadPage;
+import models.UserModel;
 import raven.swing.AvatarIcon;
 
-/**
- *
- * @author Raven
- */
-public class MyDrawerBuilder extends SimpleDrawerBuilder {
+public class DrawerBuilder extends SimpleDrawerBuilder {
 
-    private ModelUser user;
+    private UserModel user;
     private final ThemesChange themesChange;
 
-    public void setUser(ModelUser user) {
+    public void setUser(UserModel user) {
         this.user = user;
         rebuildMenu();
     }
 
-    public MyDrawerBuilder() {
+    public DrawerBuilder() {
         themesChange = new ThemesChange();
     }
 
@@ -51,12 +47,12 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
 
     @Override
     public SimpleHeaderData getSimpleHeaderData() {
-        AvatarIcon icon = new AvatarIcon(getClass().getResource("/raven/resources/image/profile.png"), 60, 60, 999);
+        AvatarIcon icon = new AvatarIcon(getClass().getResource("/resources/image/profile.png"), 60, 60, 999);
         icon.setBorder(2);
         return new SimpleHeaderData()
                 .setIcon(icon)
-                .setTitle("Ra Ven")
-                .setDescription("raven@gmail.com")
+                .setTitle("Mateo")
+                .setDescription("mateo123@gmail.com")
                 .setHeaderStyle(new SimpleHeaderStyle() {
 
                     @Override
@@ -212,7 +208,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
             public void selected(MenuAction action, int[] index) {
                 if (index.length == 1) {
                     if (index[0] == 0) {
-                        FormManager.showForm(new DashboardForm());
+                        FormManager.showForm(new DashboardPage());
                     }
                     if (index[0] == 9) {
                         // logout
@@ -221,9 +217,9 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
                 } else if (index.length == 2) {
                     if (index[0] == 1) {
                         if (index[1] == 0) {
-                            FormManager.showForm(new InboxForm());
+                            FormManager.showForm(new InboxPage());
                         } else if (index[1] == 1) {
-                            FormManager.showForm(new ReadForm());
+                            FormManager.showForm(new ReadPage());
                         }
                     }
                 }
@@ -231,7 +227,7 @@ public class MyDrawerBuilder extends SimpleDrawerBuilder {
         });
 
         simpleMenuOption.setMenus(items)
-                .setBaseIconPath("raven/resources/menu")
+                .setBaseIconPath("resources/menu")
                 .setIconScale(0.45f);
         return simpleMenuOption;
     }

@@ -1,4 +1,4 @@
-package raven.components;
+package ui.components;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
@@ -8,15 +8,11 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import net.miginfocom.swing.MigLayout;
-import raven.menu.FormManager;
-import raven.swing.slider.PanelSlider;
-import raven.swing.slider.SimpleTransition;
-import raven.swing.slider.SliderTransition;
+import ui.menu.FormManager;
+import ui.swing.slider.PanelSlider;
+import ui.swing.slider.SimpleTransition;
+import ui.swing.slider.SliderTransition;
 
-/**
- *
- * @author Raven
- */
 public class MainForm extends JPanel {
 
     private final boolean undecorated;
@@ -51,10 +47,10 @@ public class MainForm extends JPanel {
         panel.putClientProperty(FlatClientProperties.STYLE, ""
                 + "background:null");
 
-        cmdMenu = createButton(new FlatSVGIcon("raven/resources/icon/menu.svg"));
-        cmdUndo = createButton(new FlatSVGIcon("raven/resources/icon/undo.svg"));
-        cmdRedo = createButton(new FlatSVGIcon("raven/resources/icon/redo.svg"));
-        cmdRefresh = createButton(new FlatSVGIcon("raven/resources/icon/refresh.svg"));
+        cmdMenu = createButton(new FlatSVGIcon("resources/icon/menu.svg"));
+        cmdUndo = createButton(new FlatSVGIcon("resources/icon/undo.svg"));
+        cmdRedo = createButton(new FlatSVGIcon("resources/icon/redo.svg"));
+        cmdRefresh = createButton(new FlatSVGIcon("resources/icon/refresh.svg"));
         cmdMenu.addActionListener(e -> {
             FormManager.showMenu();
         });

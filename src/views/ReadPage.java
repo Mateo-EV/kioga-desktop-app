@@ -1,18 +1,15 @@
-package raven.forms;
+package views;
 
-import raven.components.SimpleForm;
-import raven.menu.FormManager;
+import ui.components.SimpleForm;
+import ui.menu.FormManager;
 
 /**
  *
  * @author RAVEN
  */
-public class ReadForm extends SimpleForm {
+public class ReadPage extends SimpleForm {
 
-    /**
-     * Creates new form ReadForm
-     */
-    public ReadForm() {
+    public ReadPage() {
         initComponents();
     }
 
@@ -81,7 +78,7 @@ public class ReadForm extends SimpleForm {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        FormManager.showForm(new InboxForm());
+        FormManager.showForm(new InboxPage());
     }//GEN-LAST:event_jButton1ActionPerformed
 
 

@@ -1,4 +1,4 @@
-package raven.swing.slider;
+package ui.swing.slider;
 
 import java.awt.Component;
 import java.awt.Graphics;

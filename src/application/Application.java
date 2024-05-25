@@ -1,4 +1,4 @@
-package raven.application;
+package application;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
@@ -11,18 +11,14 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-import raven.components.Background;
-import raven.forms.DashboardForm;
-import raven.menu.FormManager;
+import ui.components.Background;
+import views.DashboardPage;
+import ui.menu.FormManager;
 import raven.popup.GlassPanePopup;
 
-/**
- *
- * @author Raven
- */
 public class Application extends JFrame {
 
-    private final boolean UNDECORATED = !true;
+    private final boolean UNDECORATED = false;
 
     public Application() {
         init();
@@ -32,6 +28,7 @@ public class Application extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(UIScale.scale(new Dimension(1366, 768)));
         setLocationRelativeTo(null);
+        setExtendedState(MAXIMIZED_BOTH);
         if (UNDECORATED) {
             setUndecorated(UNDECORATED);
             setBackground(new Color(0, 0, 0, 0));
@@ -42,14 +39,13 @@ public class Application extends JFrame {
         // applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         GlassPanePopup.install(this);
         FormManager.install(this, UNDECORATED);
-        FormManager.showForm(new DashboardForm());
-        FormManager.logout();
+        FormManager.init();
         // applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
     }
 
     public static void main(String[] args) {
         FlatRobotoFont.install();
-        FlatLaf.registerCustomDefaultsSource("raven.themes");
+        FlatLaf.registerCustomDefaultsSource("ui.themes");
         UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
         FlatMacDarkLaf.setup();
         EventQueue.invokeLater(() -> new Application().setVisible(true));
