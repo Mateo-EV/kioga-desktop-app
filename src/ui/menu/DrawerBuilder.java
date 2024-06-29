@@ -2,12 +2,15 @@ package ui.menu;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
+import controllers.AuthController;
 import java.awt.Color;
 import java.awt.Component;
+import java.net.URL;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import models.Admin;
 import raven.drawer.component.DrawerPanel;
 import raven.drawer.component.SimpleDrawerBuilder;
 import raven.drawer.component.footer.SimpleFooterData;
@@ -23,16 +26,29 @@ import raven.drawer.component.menu.data.MenuItem;
 import views.DashboardPage;
 import views.InboxPage;
 import views.ReadPage;
-import models.UserModel;
 import raven.swing.AvatarIcon;
+import views.OrderPage;
 
 public class DrawerBuilder extends SimpleDrawerBuilder {
 
-    private UserModel user;
+    private Admin admin;
     private final ThemesChange themesChange;
 
-    public void setUser(UserModel user) {
-        this.user = user;
+    public void setAdmin(Admin admin) {
+        this.admin = admin;
+        SimpleHeaderData headerData = header.getSimpleHeaderData();
+        headerData.setTitle(admin.getName());
+        headerData.setDescription(admin.getEmail());
+        try {
+            URL url_image = new URL(admin.getImage());
+            FlatSVGIcon svg = new FlatSVGIcon(url_image);
+            AvatarIcon icon = new AvatarIcon(svg, 60, 60, 999);
+            icon.setBorder(2);
+            headerData.setIcon(icon);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        header.setSimpleHeaderData(headerData);
         rebuildMenu();
     }
 
@@ -51,7 +67,7 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
         icon.setBorder(2);
         return new SimpleHeaderData()
                 .setIcon(icon)
-                .setTitle("Mateo")
+                .setTitle("said")
                 .setDescription("mateo123@gmail.com")
                 .setHeaderStyle(new SimpleHeaderStyle() {
 
@@ -78,58 +94,20 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
     public SimpleMenuOption getSimpleMenuOption() {
 
         MenuItem items[] = new MenuItem[]{
-            new Item.Label("MAIN"),
+            new Item.Label("PRINCIPAL"),
             new Item("Dashboard", "dashboard.svg"),
-            new Item.Label("WEB APP"),
-            new Item("Email", "email.svg")
-            .subMenu("Inbox")
-            .subMenu("Read")
-            .subMenu(
-            new Item("Group Read")
-            .subMenu("Read 1")
-            .subMenu("Read 2")
-            .subMenu(
-            new Item("Group Item")
-            .subMenu("Item 1")
-            .subMenu("Item 2")
-            .subMenu("Item 3")
-            .subMenu("Item 4")
-            .subMenu("Item 5")
-            .subMenu("Item 6")
-            )
-            .subMenu("Read 3")
-            .subMenu("Read 4")
-            .subMenu("Read 5")
-            )
-            .subMenu("Compost"),
-            new Item("Chat", "chat.svg"),
-            new Item("Calendar", "calendar.svg"),
-            new Item.Label("COMPONENT"),
-            new Item("Advanced UI", "ui.svg")
-            .subMenu("Cropper")
-            .subMenu("Owl Carousel")
-            .subMenu("Sweet Alert"),
-            new Item("Forms", "forms.svg")
-            .subMenu("Basic Elements")
-            .subMenu("Advanced Elements")
-            .subMenu("SEditors")
-            .subMenu("Wizard"),
-            new Item.Label("OTHER"),
-            new Item("Charts", "chart.svg")
-            .subMenu("Apex")
-            .subMenu("Flot")
-            .subMenu("Sparkline"),
-            new Item("Icons", "icon.svg")
-            .subMenu("Feather Icons")
-            .subMenu("Flag Icons")
-            .subMenu("Mdi Icons"),
-            new Item("Special Pages", "page.svg")
-            .subMenu("Blank page")
-            .subMenu("Faq")
-            .subMenu("Invoice")
-            .subMenu("Profile")
-            .subMenu("Pricing")
-            .subMenu("Timeline"),
+            new Item.Label("GESTIÓN"),
+            new Item("Pedidos", "shopping-cart.svg")
+            .subMenu("General")
+            .subMenu("Pendientes")
+            .subMenu("En Espera")
+            .subMenu("Enviados")
+            .subMenu("Entregados")
+            .subMenu("Cancelados"),
+            new Item("Productos", "package.svg"),
+            new Item("Categorías", "rows-3.svg"),
+            new Item("Clientes", "users.svg"),
+            new Item.Label("OTROS"),
             new Item("Logout", "logout.svg")
         };
 
@@ -160,10 +138,10 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
 
             @Override
             public boolean menuValidation(int[] index) {
-                if (user == null) {
+                if (admin == null) {
                     return false;
                 }
-                if (!user.isAdmin()) {
+                if (true) {
                     // non user admin going to hide
                     boolean act
                             // `Email`->`Gropu Read`->`Read 3`
@@ -207,17 +185,19 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
             @Override
             public void selected(MenuAction action, int[] index) {
                 if (index.length == 1) {
-                    if (index[0] == 0) {
-                        FormManager.showForm(new DashboardPage());
-                    }
-                    if (index[0] == 9) {
-                        // logout
-                        FormManager.logout();
+                    switch (index[0]) {
+                        case 0:
+                            FormManager.showForm(new DashboardPage());
+                            break;
+                        case 6:
+                            AuthController.logout();
+                            FormManager.logout();
+                            break;
                     }
                 } else if (index.length == 2) {
                     if (index[0] == 1) {
                         if (index[1] == 0) {
-                            FormManager.showForm(new InboxPage());
+                            FormManager.showForm(new OrderPage());
                         } else if (index[1] == 1) {
                             FormManager.showForm(new ReadPage());
                         }

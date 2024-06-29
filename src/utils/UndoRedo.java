@@ -1,16 +1,17 @@
 package utils;
 
+import utils.structure.Pila;
 import java.util.Iterator;
 import java.util.Stack;
 
 public class UndoRedo<E> implements Iterable<E> {
 
-    private final Stack<E> stack1;
-    private final Stack<E> stack2;
+    private final Pila<E> stack1;
+    private final Pila<E> stack2;
 
     public UndoRedo() {
-        stack1 = new Stack<>();
-        stack2 = new Stack<>();
+        stack1 = new Pila<>();
+        stack2 = new Pila<>();
     }
 
     public void add(E item) {
@@ -21,7 +22,7 @@ public class UndoRedo<E> implements Iterable<E> {
     public E undo() {
         if (stack1.size() > 1) {
             stack2.push(stack1.pop());
-            return stack1.get(stack1.size() - 1);
+            return stack1.peek();
         } else {
             return null;
         }
@@ -50,7 +51,7 @@ public class UndoRedo<E> implements Iterable<E> {
     }
 
     public boolean isRedoAble() {
-        return !stack2.empty();
+        return !stack2.isEmpty();
     }
 
     public void clear() {

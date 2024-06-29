@@ -48,7 +48,7 @@ public class DashboardPage extends SimpleForm {
     }
 
     private void init() {
-        setLayout(new MigLayout("wrap,fill,gap 10", "fill"));
+        setLayout(new MigLayout("wrap,fillx,gap 10", "fill", "top"));
         createPieChart();
         createLineChart();
         createBarChart();

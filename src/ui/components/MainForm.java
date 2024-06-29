@@ -28,7 +28,7 @@ public class MainForm extends JPanel {
                     + "border:5,5,5,5;"
                     + "arc:30");
         }
-        setLayout(new MigLayout("wrap,fillx", "[fill]", ""));
+        setLayout(new MigLayout("wrap,fill", "[fill]", "[min!][fill]"));
         header = createHeader();
         panelSlider = new PanelSlider();
         JScrollPane scroll = new JScrollPane(panelSlider);

@@ -1,28 +1,35 @@
 package views;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import controllers.AuthController;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import models.Admin;
 import net.miginfocom.swing.MigLayout;
 import ui.menu.FormManager;
-import models.UserModel;
+import utils.ApiClient;
+import raven.alerts.MessageAlerts;
+import ui.components.LoadingButton;
+import utils.TimeOut;
 
 public class LoginPage extends JPanel {
-
     public LoginPage() {
         init();
     }
 
+    private JTextField txtEmail;
+    private JPasswordField txtPassword;
+    private LoadingButton cmdLogin;
+
     private void init() {
         setLayout(new MigLayout("fill,insets 20", "[center]", "[center]"));
-        txtUsername = new JTextField();
+        txtEmail = new JTextField();
         txtPassword = new JPasswordField();
-        chRememberMe = new JCheckBox("Remember me");
-        cmdLogin = new JButton("Login");
+        cmdLogin = new LoadingButton("Login");
+        
         JPanel panel = new JPanel(new MigLayout("wrap,fillx,insets 35 45 30 45", "fill,250:280"));
         panel.putClientProperty(FlatClientProperties.STYLE, ""
                 + "arc:20;"
@@ -31,18 +38,13 @@ public class LoginPage extends JPanel {
 
         txtPassword.putClientProperty(FlatClientProperties.STYLE, ""
                 + "showRevealButton:true");
-        cmdLogin.putClientProperty(FlatClientProperties.STYLE, ""
-                + "[light]background:darken(@background,10%);"
-                + "[dark]background:lighten(@background,10%);"
-                + "borderWidth:0;"
-                + "focusWidth:0;"
-                + "innerFocusWidth:0");
+        
 
-        txtUsername.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your username or email");
-        txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your password");
+        txtEmail.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Ingresa tu email");
+        txtPassword.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Ingresa tu contraseña");
 
         JLabel lbTitle = new JLabel("KIOGA");
-        JLabel description = new JLabel("Please sign in to access your account");
+        JLabel description = new JLabel("Inicia sesión para acceder a tu cuenta");
         lbTitle.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:bold +10");
         description.putClientProperty(FlatClientProperties.STYLE, ""
@@ -51,25 +53,49 @@ public class LoginPage extends JPanel {
 
         panel.add(lbTitle);
         panel.add(description);
-        panel.add(new JLabel("Username"), "gapy 8");
-        panel.add(txtUsername);
-        panel.add(new JLabel("Password"), "gapy 8");
+        panel.add(new JLabel("Email"), "gapy 8");
+        panel.add(txtEmail);
+        panel.add(new JLabel("Contraseña"), "gapy 8");
         panel.add(txtPassword);
-        panel.add(chRememberMe, "grow 0");
         panel.add(cmdLogin, "gapy 10");
         add(panel);
-
+//cmdLogin.startLoading();
         // event
         cmdLogin.addActionListener((e) -> {
-            String userName = txtUsername.getText().trim();
-            // this is just for example to check admin user :)
-            boolean isAdmin = userName.equals("admin");
-            FormManager.login(new UserModel(userName, isAdmin));
+            String email = txtEmail.getText().trim();
+            String password = String.valueOf(txtPassword.getPassword()).trim();
+
+            // Deshabilitar el botón y mostrar el spinner
+            cmdLogin.startLoading();
+
+            AuthController.login(
+                email,
+                password,
+                new ApiClient.onResponse(){
+                    @Override
+                    public void onSuccess(ApiClient.ApiResponse response) {
+                        TimeOut.set(()-> {
+                                    MessageAlerts.getInstance().showMessage(
+                                            "Excelente", 
+                                            response.getMessage(),
+                                            MessageAlerts.MessageType.SUCCESS
+                                    );
+                                }, 750);
+                                cmdLogin.stopLoading();
+                                FormManager.login((Admin) response.getData());
+                    }
+                    @Override
+                    public void onError(ApiClient.ApiResponse response) {
+                        MessageAlerts.getInstance().showMessage(
+                            "Error", 
+                            response.getMessage(),
+                            MessageAlerts.MessageType.ERROR
+                        );
+                        cmdLogin.stopLoading();
+                        System.out.println(response.getMessage());
+                    }
+                }
+            );
         });
     }
-
-    private JTextField txtUsername;
-    private JPasswordField txtPassword;
-    private JCheckBox chRememberMe;
-    private JButton cmdLogin;
 }

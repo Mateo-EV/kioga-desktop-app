@@ -12,9 +12,9 @@ import java.awt.Font;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import ui.components.Background;
-import views.DashboardPage;
 import ui.menu.FormManager;
 import raven.popup.GlassPanePopup;
+import raven.toast.Notifications;
 
 public class Application extends JFrame {
 
@@ -38,6 +38,7 @@ public class Application extends JFrame {
         setContentPane(new Background(UNDECORATED));
         // applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         GlassPanePopup.install(this);
+        Notifications.getInstance().setJFrame(this);
         FormManager.install(this, UNDECORATED);
         FormManager.init();
         // applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);

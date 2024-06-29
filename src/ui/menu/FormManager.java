@@ -1,13 +1,14 @@
 package ui.menu;
 
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
+import controllers.AuthController;
 import java.awt.Image;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import models.Admin;
 import ui.components.MainForm;
 import ui.components.SimpleForm;
 import views.LoginPage;
-import models.UserModel;
 import ui.swing.slider.PanelSlider;
 import ui.swing.slider.SimpleTransition;
 import utils.UndoRedo;
@@ -44,7 +45,12 @@ public class FormManager {
     }
     
     public static void init() {
-        logout();
+        Admin admin = AuthController.getSession();
+        if (admin == null) {
+            logout();
+        } else {
+            login(admin);
+        }
         showForm(new DashboardPage());
     }
 
@@ -79,13 +85,13 @@ public class FormManager {
         FlatAnimatedLafChange.hideSnapshotWithAnimation();
     }
 
-    public static void login(UserModel user) {
+    public static void login(Admin admin) {
         FlatAnimatedLafChange.showSnapshot();
         
         instance.frame.getContentPane().removeAll();
         instance.frame.getContentPane().add(instance.panelSlider);
         // set new user and rebuild menu for user role
-        ((DrawerBuilder) instance.menu.getDrawerBuilder()).setUser(user);
+        ((DrawerBuilder) instance.menu.getDrawerBuilder()).setAdmin(admin);
         instance.frame.repaint();
         instance.frame.revalidate();
         FlatAnimatedLafChange.hideSnapshotWithAnimation();
