@@ -4,30 +4,47 @@
  */
 package models;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 /**
  *
  * @author intel
  */
-public class Product {
+public class Product extends TimeStamps {
+
     private int id;
     private String name;
+    private String slug;
+    private String image;
     private String description;
     private double price;
+    private double discount;
+    private double price_discounted;
     private int stock;
     private Category category;
     private Brand brand;
+    private boolean is_active;
 
-    public Product() {}
+    public Product() {
+    }
 
-    public Product(int id, String name, String description, double price, int stock, Category category, Brand brand) {
+    public Product(int id, String name, String slug, String description,
+        String image, boolean isActive, double price, double discount, int stock,
+        Category category, Brand brand) {
         this.id = id;
         this.name = name;
+        this.slug = slug;
         this.description = description;
         this.price = price;
         this.stock = stock;
         this.category = category;
         this.brand = brand;
+        this.discount = discount;
     }
+
+    private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(
+        new Locale("es", "PE"));
 
     public int getId() {
         return id;
@@ -83,5 +100,49 @@ public class Product {
 
     public void setBrand(Brand brand) {
         this.brand = brand;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
+    public boolean isIsActive() {
+        return is_active;
+    }
+
+    public void setIsActive(boolean is_active) {
+        this.is_active = is_active;
+    }
+
+    public double getPriceDiscounted() {
+        return price_discounted;
+    }
+
+    public void setPriceDiscounted(double price_discounted) {
+        this.price_discounted = price_discounted;
+    }
+
+    public String getPriceDiscountedFormatted() {
+        return currencyFormat.format(price_discounted);
     }
 }

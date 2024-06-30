@@ -1,18 +1,33 @@
 package models;
 
-public class Customer {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Customer extends TimeStamps {
+
     private int id;
     private String name;
     private String email;
     private String password;
-    
-    public Customer(){};
+
+    private List<Address> addresses;
+
+    public Customer() {
+    }
 
     public Customer(int id, String name, String email, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.addresses = new ArrayList();
+    }
+
+    public Customer(int id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.addresses = new ArrayList();
     }
 
     public int getId() {
@@ -41,5 +56,9 @@ public class Customer {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
     }
 }

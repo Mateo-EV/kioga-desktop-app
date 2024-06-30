@@ -23,11 +23,11 @@ import raven.drawer.component.menu.SimpleMenuOption;
 import raven.drawer.component.menu.SimpleMenuStyle;
 import raven.drawer.component.menu.data.Item;
 import raven.drawer.component.menu.data.MenuItem;
-import views.DashboardPage;
-import views.InboxPage;
-import views.ReadPage;
 import raven.swing.AvatarIcon;
+import views.DashboardPage;
 import views.OrderPage;
+import views.ProductPage;
+import views.ReadPage;
 
 public class DrawerBuilder extends SimpleDrawerBuilder {
 
@@ -63,26 +63,27 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
 
     @Override
     public SimpleHeaderData getSimpleHeaderData() {
-        AvatarIcon icon = new AvatarIcon(getClass().getResource("/resources/image/profile.png"), 60, 60, 999);
+        AvatarIcon icon = new AvatarIcon(getClass().getResource(
+            "/resources/image/profile.png"), 60, 60, 999);
         icon.setBorder(2);
         return new SimpleHeaderData()
-                .setIcon(icon)
-                .setTitle("said")
-                .setDescription("mateo123@gmail.com")
-                .setHeaderStyle(new SimpleHeaderStyle() {
+            .setIcon(icon)
+            .setTitle("said")
+            .setDescription("mateo123@gmail.com")
+            .setHeaderStyle(new SimpleHeaderStyle() {
 
-                    @Override
-                    public void styleTitle(JLabel label) {
-                        label.putClientProperty(FlatClientProperties.STYLE, ""
-                                + "[light]foreground:#FAFAFA");
-                    }
+                @Override
+                public void styleTitle(JLabel label) {
+                    label.putClientProperty(FlatClientProperties.STYLE, ""
+                        + "[light]foreground:#FAFAFA");
+                }
 
-                    @Override
-                    public void styleDescription(JLabel label) {
-                        label.putClientProperty(FlatClientProperties.STYLE, ""
-                                + "[light]foreground:#E1E1E1");
-                    }
-                });
+                @Override
+                public void styleDescription(JLabel label) {
+                    label.putClientProperty(FlatClientProperties.STYLE, ""
+                        + "[light]foreground:#E1E1E1");
+                }
+            });
     }
 
     @Override
@@ -116,7 +117,8 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
             public Icon buildMenuIcon(String path, float scale) {
                 FlatSVGIcon icon = new FlatSVGIcon(path, scale);
                 FlatSVGIcon.ColorFilter colorFilter = new FlatSVGIcon.ColorFilter();
-                colorFilter.add(Color.decode("#969696"), Color.decode("#FAFAFA"), Color.decode("#969696"));
+                colorFilter.add(Color.decode("#969696"), Color.decode("#FAFAFA"),
+                    Color.decode("#969696"));
                 icon.setColorFilter(colorFilter);
                 return icon;
             }
@@ -144,16 +146,16 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
                 if (true) {
                     // non user admin going to hide
                     boolean act
-                            // `Email`->`Gropu Read`->`Read 3`
-                            = checkMenu(index, new int[]{1, 2, 3})
-                            // `Email`->`Gropu Read`->`Read 5`
-                            && checkMenu(index, new int[]{1, 2, 5})
-                            // `Email`->`Group Read`->`Group Item->`Item 4`
-                            && checkMenu(index, new int[]{1, 2, 2, 3})
-                            // `Advanced UI`->`Owl Carousel`
-                            && checkMenu(index, new int[]{4, 1})
-                            // `Special Pages`
-                            && checkMenu(index, new int[]{8});
+                        // `Email`->`Gropu Read`->`Read 3`
+                        = checkMenu(index, new int[]{1, 2, 3})
+                        // `Email`->`Gropu Read`->`Read 5`
+                        && checkMenu(index, new int[]{1, 2, 5})
+                        // `Email`->`Group Read`->`Group Item->`Item 4`
+                        && checkMenu(index, new int[]{1, 2, 2, 3})
+                        // `Advanced UI`->`Owl Carousel`
+                        && checkMenu(index, new int[]{4, 1})
+                        // `Special Pages`
+                        && checkMenu(index, new int[]{8});
                     return act;
                 }
                 return true;
@@ -164,21 +166,21 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
             @Override
             public void styleMenuItem(JButton menu, int[] index) {
                 menu.putClientProperty(FlatClientProperties.STYLE, ""
-                        + "[light]foreground:#FAFAFA;"
-                        + "arc:10");
+                    + "[light]foreground:#FAFAFA;"
+                    + "arc:10");
             }
 
             @Override
             public void styleMenu(JComponent component) {
                 component.putClientProperty(FlatClientProperties.STYLE, ""
-                        + "background:$Drawer.background");
+                    + "background:$Drawer.background");
             }
 
             @Override
             public void styleLabel(JLabel label) {
                 label.putClientProperty(FlatClientProperties.STYLE, ""
-                        + "[light]foreground:darken(#FAFAFA,15%);"
-                        + "[dark]foreground:darken($Label.foreground,30%)");
+                    + "[light]foreground:darken(#FAFAFA,15%);"
+                    + "[dark]foreground:darken($Label.foreground,30%)");
             }
         });
         simpleMenuOption.addMenuEvent(new MenuEvent() {
@@ -188,6 +190,9 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
                     switch (index[0]) {
                         case 0:
                             FormManager.showForm(new DashboardPage());
+                            break;
+                        case 2:
+                            FormManager.showForm(new ProductPage());
                             break;
                         case 6:
                             AuthController.logout();
@@ -207,8 +212,8 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
         });
 
         simpleMenuOption.setMenus(items)
-                .setBaseIconPath("resources/menu")
-                .setIconScale(0.45f);
+            .setBaseIconPath("resources/menu")
+            .setIconScale(0.45f);
         return simpleMenuOption;
     }
 
@@ -216,7 +221,7 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
 
     public void build(DrawerPanel drawerPanel) {
         drawerPanel.putClientProperty(FlatClientProperties.STYLE, ""
-                + "background:$Drawer.background");
+            + "background:$Drawer.background");
     }
 
     @Override

@@ -2,7 +2,6 @@ package utils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -18,15 +17,19 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ApiClient {
+
     private static final String BASE_URL = "http://localhost:8000";
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse(
+        "application/json; charset=utf-8");
 
     private static String token;
-    
+
     public interface onResponse {
+
         void onSuccess(ApiResponse apiResponse);
+
         void onError(ApiResponse apiResponse);
     }
 
@@ -38,36 +41,40 @@ public class ApiClient {
         return token != null && !token.isEmpty();
     }
 
-    public static HashMap<String, Object> sendRequest(String endpoint, String method, Map<String, Object> data) throws ApiException, IOException {
-        Request request = null;
-        if(method.equalsIgnoreCase("GET")) {
+    public static HashMap<String, Object> sendRequest(String endpoint,
+        String method, Map<String, Object> data) throws ApiException, IOException {
+        Request request;
+        if (method.equalsIgnoreCase("GET")) {
             request = createRequest(endpoint);
         } else {
             RequestBody body = createRequestBody(data);
             request = createRequest(endpoint, method, body);
         }
-        
+
         try (Response response = client.newCall(request).execute()) {
             String bodyString = response.body().string();
             System.out.println(bodyString);
-            Type type = new TypeToken<HashMap<String, Object>>() {}.getType();
+            Type type = new TypeToken<HashMap<String, Object>>() {
+            }.getType();
             if (!response.isSuccessful()) {
-                Map<String, Object> errorFormatted = gson.fromJson(bodyString, type);
-                throw new ApiException(response.code(), (String) errorFormatted.get("message"));
+                Map<String, Object> errorFormatted = gson.fromJson(bodyString,
+                    type);
+                throw new ApiException(response.code(),
+                    (String) errorFormatted.get("message"));
             }
             return gson.fromJson(bodyString, type);
         }
     }
 
-    public static List<HashMap<String, Object>> sendRequestForList(String endpoint, String method, Map<String, Object> data) throws ApiException, IOException {
-        Request request = null;
-        if(method.equalsIgnoreCase("GET")) {
+    public static List<HashMap<String, Object>> sendRequestForList(
+        String endpoint, String method, Map<String, Object> data) throws ApiException, IOException {
+        Request request;
+        if (method.equalsIgnoreCase("GET")) {
             request = createRequest(endpoint);
         } else {
             RequestBody body = createRequestBody(data);
             request = createRequest(endpoint, method, body);
         }
-
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 String errorBody = response.body().string();
@@ -75,7 +82,8 @@ public class ApiClient {
             }
 
             String responseData = response.body().string();
-            Type type = new TypeToken<List<HashMap<String, Object>>>() {}.getType();
+            Type type = new TypeToken<List<HashMap<String, Object>>>() {
+            }.getType();
             return gson.fromJson(responseData, type);
         }
     }
@@ -85,16 +93,21 @@ public class ApiClient {
             return RequestBody.create("", JSON);
         }
 
-        boolean hasFile = data.values().stream().anyMatch(value -> value instanceof File);
+        boolean hasFile = data.values().stream().anyMatch(
+            value -> value instanceof File);
         if (hasFile) {
-            MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            MultipartBody.Builder builder = new MultipartBody.Builder().setType(
+                MultipartBody.FORM);
 
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 if (entry.getValue() instanceof File) {
                     File file = (File) entry.getValue();
-                    builder.addFormDataPart(entry.getKey(), file.getName(), RequestBody.create(file, MediaType.parse("application/octet-stream")));
+                    builder.addFormDataPart(entry.getKey(), file.getName(),
+                        RequestBody.create(file, MediaType.parse(
+                            "application/octet-stream")));
                 } else {
-                    builder.addFormDataPart(entry.getKey(), entry.getValue().toString());
+                    builder.addFormDataPart(entry.getKey(),
+                        entry.getValue().toString());
                 }
             }
 
@@ -105,17 +118,19 @@ public class ApiClient {
         }
     }
 
-    private static Request createRequest(String endpoint, String method, RequestBody body) {
+    private static Request createRequest(String endpoint, String method,
+        RequestBody body) {
         HttpUrl url = HttpUrl.parse(BASE_URL + endpoint);
 
         if (url == null) {
-            throw new IllegalArgumentException("Invalid URL: " + BASE_URL + endpoint);
+            throw new IllegalArgumentException(
+                "Invalid URL: " + BASE_URL + endpoint);
         }
-        
+
         Request.Builder builder = new Request.Builder()
-                .url(BASE_URL + endpoint)
-                .method(method, body)
-                .addHeader("Accept", "application/json");
+            .url(BASE_URL + endpoint)
+            .method(method, body)
+            .addHeader("Accept", "application/json");
 
         if (token != null && !token.isEmpty()) {
             builder.addHeader("Authorization", "Bearer " + token);
@@ -128,12 +143,13 @@ public class ApiClient {
         HttpUrl url = HttpUrl.parse(BASE_URL + endpoint);
 
         if (url == null) {
-            throw new IllegalArgumentException("Invalid URL: " + BASE_URL + endpoint);
+            throw new IllegalArgumentException(
+                "Invalid URL: " + BASE_URL + endpoint);
         }
-        
+
         Request.Builder builder = new Request.Builder()
-                .url(BASE_URL + endpoint)
-                .addHeader("Accept", "application/json");
+            .url(BASE_URL + endpoint)
+            .addHeader("Accept", "application/json");
 
         if (token != null && !token.isEmpty()) {
             builder.addHeader("Authorization", "Bearer " + token);
@@ -143,6 +159,7 @@ public class ApiClient {
     }
 
     public static class ApiException extends Exception {
+
         private int statusCode;
         private String errorBody;
 
@@ -167,6 +184,7 @@ public class ApiClient {
     }
 
     public static class ApiResponse {
+
         private final ResponseType type;
         private final String message;
         private Object data;

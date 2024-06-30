@@ -27,18 +27,18 @@ public class Address {
     }
 
     public Address(
-            int id,
-            Customer user,
-            String first_name,
-            String last_name,
-            String dni,
-            String phone,
-            String department,
-            String province,
-            String district,
-            String street_address,
-            String zip_code,
-            String reference
+        int id,
+        Customer user,
+        String first_name,
+        String last_name,
+        String dni,
+        String phone,
+        String department,
+        String province,
+        String district,
+        String street_address,
+        String zip_code,
+        String reference
     ) {
         this.id = id;
         this.user = user;
@@ -52,6 +52,14 @@ public class Address {
         this.street_address = street_address;
         this.zip_code = zip_code;
         this.reference = reference;
+    }
+
+    public String getFormattedDirection() {
+        if (department == null) {
+            return first_name + ", " + last_name + ", " + dni;
+        } else {
+            return department + ", " + street_address;
+        }
     }
 
     public int getId() {
@@ -70,19 +78,19 @@ public class Address {
         this.user = user;
     }
 
-    public String getFirst_name() {
+    public String getFirstName() {
         return first_name;
     }
 
-    public void setFirst_name(String first_name) {
+    public void setFirstName(String first_name) {
         this.first_name = first_name;
     }
 
-    public String getLast_name() {
+    public String getLastName() {
         return last_name;
     }
 
-    public void setLast_name(String last_name) {
+    public void setLastName(String last_name) {
         this.last_name = last_name;
     }
 
@@ -126,19 +134,19 @@ public class Address {
         this.district = district;
     }
 
-    public String getStreet_address() {
+    public String getStreetAddress() {
         return street_address;
     }
 
-    public void setStreet_address(String street_address) {
+    public void setStreetAddress(String street_address) {
         this.street_address = street_address;
     }
 
-    public String getZip_code() {
+    public String getZipCode() {
         return zip_code;
     }
 
-    public void setZip_code(String zip_code) {
+    public void setZipCode(String zip_code) {
         this.zip_code = zip_code;
     }
 

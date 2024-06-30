@@ -1,14 +1,15 @@
 package ui.components;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.AlphaComposite;
 import javax.swing.JPanel;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
 
 public class LoadingSkeleton extends JPanel {
+
     private static final int PULSE_DURATION = 1000; // Duración del pulso en milisegundos
     private float pulseAlpha = 0.05f; // Transparencia inicial (20%)
     private final int borderRadius = 20; // Radio del borde redondeado
@@ -17,6 +18,13 @@ public class LoadingSkeleton extends JPanel {
 
     public LoadingSkeleton() {
         initPulseAnimation();
+    }
+
+    public LoadingSkeleton(boolean start) {
+        initPulseAnimation();
+        if (start) {
+            startLoading();
+        }
     }
 
     private void initPulseAnimation() {
@@ -53,10 +61,12 @@ public class LoadingSkeleton extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, pulseAlpha));
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+            pulseAlpha));
         Color pulseColor = new Color(211, 211, 211);
         g2d.setColor(pulseColor);
-        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), borderRadius, borderRadius); // Dibujar rectángulo redondeado
+        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), borderRadius,
+            borderRadius); // Dibujar rectángulo redondeado
         g2d.dispose();
     }
 }
