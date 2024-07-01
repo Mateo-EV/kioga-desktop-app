@@ -93,7 +93,7 @@ public class BackgroundSwingWorker extends SwingWorker<Object, Void> {
 
             return combinedResults;
 
-        } catch (IOException | ApiClient.ApiException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

@@ -92,7 +92,7 @@
             <Component class="javax.swing.JTable" name="table">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                  <Table columnCount="7" rowCount="0">
+                  <Table columnCount="8" rowCount="0">
                     <Column editable="true" title="SELECT" type="java.lang.Boolean"/>
                     <Column editable="false" title="C&#xd3;DIGO" type="java.lang.Object"/>
                     <Column editable="false" title="IMPORTE" type="java.lang.Object"/>
@@ -100,6 +100,7 @@
                     <Column editable="false" title="ESTADO" type="java.lang.Object"/>
                     <Column editable="false" title="FECHA" type="java.lang.Object"/>
                     <Column editable="false" title="HORA" type="java.lang.Object"/>
+                    <Column editable="false" title="" type="java.lang.Object"/>
                   </Table>
                 </Property>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -139,12 +140,20 @@
                       <Editor/>
                       <Renderer/>
                     </Column>
+                    <Column maxWidth="0" minWidth="-1" prefWidth="0" resizable="true">
+                      <Title/>
+                      <Editor/>
+                      <Renderer/>
+                    </Column>
                   </TableColumnModel>
                 </Property>
                 <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
                   <TableHeader reorderingAllowed="false" resizingAllowed="true"/>
                 </Property>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="25"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -161,6 +170,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Eliminar"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="actionButton1ActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ui.components.ActionButton(ActionButton.DESTRUCTIVE)"/>
           </AuxValues>

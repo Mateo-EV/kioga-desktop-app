@@ -25,6 +25,7 @@ import ui.table.CheckBoxTableHeaderRenderer;
 import ui.table.ImageTableRenderer;
 import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
+import utils.GlobalCacheState;
 import views.dialog.CreateOrderForm;
 
 /**
@@ -101,6 +102,28 @@ public class ProductPage extends SimpleForm {
         loadData();
     }
 
+    public static void syncProducts() {
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        tableModel.setRowCount(0);
+        for (Product product : GlobalCacheState.getProducts()) {
+            addProductToTable(product);
+        }
+    }
+
+    private static void addProductToTable(Product product) {
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        tableModel.addRow(new Object[]{
+            false,
+            product.getId(),
+            product.getName(),
+            product.getImage(),
+            product.getPriceDiscountedFormatted(),
+            product.getStock(),
+            product.getDescription(),
+            product.getCreatedAtDate(),
+            product.getUpdatedAtDate(),});
+    }
+
     private void showTable() {
         scroll.setViewportView(table);
         Color color = table.getForeground();
@@ -138,18 +161,7 @@ public class ProductPage extends SimpleForm {
             public void onSuccess(ApiClient.ApiResponse response) {
                 List<Product> products = (List<Product>) response.getData();
                 tableModel.setRowCount(0);
-                products.forEach((product) -> {
-                    tableModel.addRow(new Object[]{
-                        false,
-                        product.getId(),
-                        product.getName(),
-                        product.getImage(),
-                        product.getPriceDiscountedFormatted(),
-                        product.getStock(),
-                        product.getDescription(),
-                        product.getCreatedAtDate(),
-                        product.getUpdatedAtDate(),});
-                });
+                products.forEach((product) -> addProductToTable(product));
                 showTable();
                 loadingSkeleton.stopLoading();
             }
@@ -176,7 +188,6 @@ public class ProductPage extends SimpleForm {
 
         panel = new javax.swing.JPanel();
         scroll = new javax.swing.JScrollPane();
-        table = new javax.swing.JTable();
         jSeparator1 = new javax.swing.JSeparator();
         txtSearch = new javax.swing.JTextField();
         lbTitle = new javax.swing.JLabel();
@@ -305,7 +316,7 @@ public class ProductPage extends SimpleForm {
     private javax.swing.JLabel lbTitle;
     private javax.swing.JPanel panel;
     private javax.swing.JScrollPane scroll;
-    private javax.swing.JTable table;
+    public static final javax.swing.JTable table = new javax.swing.JTable();
     private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

@@ -8,7 +8,11 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import controllers.OrderController;
 import java.awt.Color;
+import java.awt.Component;
+import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import models.Order;
 import net.miginfocom.swing.MigLayout;
@@ -18,13 +22,16 @@ import raven.alerts.MessageAlerts;
 import raven.popup.DefaultOption;
 import raven.popup.GlassPanePopup;
 import raven.popup.component.SimplePopupBorder;
+import raven.toast.Notifications;
+import ui.components.ActionButton;
 import ui.components.LoadingSkeleton;
 import ui.components.SimpleForm;
-import ui.components.ActionButton;
 import ui.table.CheckBoxTableHeaderRenderer;
 import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
+import utils.GlobalCacheState;
 import views.dialog.CreateOrderForm;
+import views.dialog.DeleteOrderForm;
 
 /**
  *
@@ -33,6 +40,7 @@ import views.dialog.CreateOrderForm;
 public class OrderPage extends SimpleForm {
 
     private final LoadingSkeleton loadingSkeleton;
+
     /**
      * Creates new form OrderPage
      */
@@ -48,68 +56,82 @@ public class OrderPage extends SimpleForm {
         showLoadingSkeleton();
         loadData();
     }
-    
+
     private void init() {
         showLoadingSkeleton();
-        
+
         lbTitle.putClientProperty(
-                FlatClientProperties.STYLE, 
-                "font:+5;" +
-                "font:bold +5"
+            FlatClientProperties.STYLE,
+            "font:+5;"
+            + "font:bold +5"
         );
-        
-        txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Buscar pedidos");
-        txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON, new FlatSVGIcon("resources/icon/search.svg"));
-        
+
+        txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
+            "Buscar pedidos");
+        txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON,
+            new FlatSVGIcon("resources/icon/search.svg"));
+
         panel.putClientProperty(
-            FlatClientProperties.STYLE, 
+            FlatClientProperties.STYLE,
             "arc:25"
         );
-        
+
         table.getTableHeader().putClientProperty(
-                FlatClientProperties.STYLE,
-                "height:30;" +
-                "hoverBackground:null;" +
-                "pressedBackground:null;" +
-                "separatorColor:$TableHeader.background;" +
-                "font:bold;"
+            FlatClientProperties.STYLE,
+            "height:30;"
+            + "hoverBackground:null;"
+            + "pressedBackground:null;"
+            + "separatorColor:$TableHeader.background;"
+            + "font:bold;"
         );
-        
+
         table.putClientProperty(
-                FlatClientProperties.STYLE,
-                "rowHeight:30;" +
-                "showHorizontalLines:true;" +
-                "intercellSpacing:0,1;" +
-                "cellFocusColor:$TableHeader.hoverBackground" +
-                "selectionBackground:$TableHeader.hoverBackground"
+            FlatClientProperties.STYLE,
+            "rowHeight:30;"
+            + "showHorizontalLines:true;"
+            + "intercellSpacing:0,1;"
+            + "cellFocusColor:$TableHeader.hoverBackground"
+            + "selectionBackground:$TableHeader.hoverBackground"
         );
-        
+
         table.getColumnModel().getColumn(0).setHeaderRenderer(
-                new CheckBoxTableHeaderRenderer(table, 0)
+            new CheckBoxTableHeaderRenderer(table, 0)
         );
-        
-        table.getTableHeader().setDefaultRenderer(new TableHeaderAlignment(table));
-        
+
+        table.getTableHeader().setDefaultRenderer(
+            new TableHeaderAlignment(table));
+
+        table.getColumnModel().getColumn(7).setCellRenderer(
+            new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table,
+                Object value, boolean isSelected, boolean hasFocus, int row,
+                int column) {
+                return null;
+            }
+
+        });
+
         loadData();
     }
-    
+
     private void showTable() {
         scroll.setViewportView(table);
         Color color = table.getForeground();
-        table.setForeground(new Color(color.getRed(), 
-                        color.getGreen(), 
-                        color.getBlue(), 0));
-        
+        table.setForeground(new Color(color.getRed(),
+            color.getGreen(),
+            color.getBlue(), 0));
+
         Animator animator = new Animator(750); // Duración de 1 segundo
-        animator.addTarget(new TimingTargetAdapter(){
+        animator.addTarget(new TimingTargetAdapter() {
             @Override
             public void timingEvent(float fraction) {
                 int alpha = (int) (255 * fraction);
                 table.setForeground(
                     new Color(
-                        color.getRed(), 
-                        color.getGreen(), 
-                        color.getBlue(), 
+                        color.getRed(),
+                        color.getGreen(),
+                        color.getBlue(),
                         alpha
                     )
                 );
@@ -117,30 +139,42 @@ public class OrderPage extends SimpleForm {
         });
         animator.start();
     }
-    
+
     private void showLoadingSkeleton() {
         loadingSkeleton.startLoading();
         scroll.setViewportView(loadingSkeleton);
     }
-    
+
+    public static void syncOrders() {
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        tableModel.setRowCount(0);
+        for (Order order : GlobalCacheState.getOrders()) {
+            addOrderToTable(order);
+        }
+    }
+
+    private static void addOrderToTable(Order order) {
+        DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        tableModel.addRow(new Object[]{
+            false,
+            order.getCode(),
+            order.getAmountFormatted(),
+            1,
+            order.getStatus().getValue(),
+            order.getCreatedAtDate(),
+            order.getCreatedAtTime(),
+            order
+        });
+    }
+
     private void loadData() {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        OrderController.instance.findAll(new ApiClient.onResponse() {
+        OrderController.getInstance().findAll(new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse response) {
                 List<Order> orders = (List<Order>) response.getData();
                 tableModel.setRowCount(0);
-                orders.forEach((order) -> {
-                    tableModel.addRow(new Object[]{
-                        false,
-                        order.getCode(),
-                        order.getAmountFormatted(),
-                        1,
-                        order.getStatus().getValue(),
-                        order.getCreatedAtDate(),
-                        order.getCreatedAtTime(),
-                    });
-                });
+                orders.forEach((order) -> addOrderToTable(order));
                 showTable();
                 loadingSkeleton.stopLoading();
             }
@@ -148,12 +182,23 @@ public class OrderPage extends SimpleForm {
             @Override
             public void onError(ApiClient.ApiResponse response) {
                 MessageAlerts.getInstance().showMessage(
-                            "Error", 
-                            response.getMessage(),
-                            MessageAlerts.MessageType.ERROR
-                        );
+                    "Error",
+                    response.getMessage(),
+                    MessageAlerts.MessageType.ERROR
+                );
             }
         });
+    }
+
+    private List<Order> getSelectedData() {
+        List<Order> list = new ArrayList();
+        for (int i = 0; i < table.getRowCount(); i++) {
+            if ((boolean) table.getValueAt(i, 0)) {
+                Order data = (Order) table.getValueAt(i, 7);
+                list.add(data);
+            }
+        }
+        return list;
     }
 
     /**
@@ -167,7 +212,6 @@ public class OrderPage extends SimpleForm {
 
         panel = new javax.swing.JPanel();
         scroll = new javax.swing.JScrollPane();
-        table = new javax.swing.JTable();
         jSeparator1 = new javax.swing.JSeparator();
         txtSearch = new javax.swing.JTextField();
         lbTitle = new javax.swing.JLabel();
@@ -184,14 +228,14 @@ public class OrderPage extends SimpleForm {
 
             },
             new String [] {
-                "SELECT", "CÓDIGO", "IMPORTE", "PRODUCTOS", "ESTADO", "FECHA", "HORA"
+                "SELECT", "CÓDIGO", "IMPORTE", "PRODUCTOS", "ESTADO", "FECHA", "HORA", ""
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Boolean.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Boolean.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                true, false, false, false, false, false, false
+                true, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -211,11 +255,18 @@ public class OrderPage extends SimpleForm {
             table.getColumnModel().getColumn(3).setPreferredWidth(150);
             table.getColumnModel().getColumn(4).setPreferredWidth(150);
             table.getColumnModel().getColumn(5).setPreferredWidth(150);
+            table.getColumnModel().getColumn(7).setPreferredWidth(0);
+            table.getColumnModel().getColumn(7).setMaxWidth(0);
         }
 
         lbTitle.setText("Pedidos");
 
         actionButton1.setText("Eliminar");
+        actionButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionButton1ActionPerformed(evt);
+            }
+        });
 
         actionButton2.setText("Agregar");
         actionButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -281,10 +332,30 @@ public class OrderPage extends SimpleForm {
         };
         GlassPanePopup.showPopup(
             new SimplePopupBorder(
-                dialog, 
-                "Crear Pedido"),option);
+                dialog,
+                "Crear Pedido"), option);
     }//GEN-LAST:event_actionButton2ActionPerformed
 
+    private void actionButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionButton1ActionPerformed
+        List<Order> list = getSelectedData();
+        if (list.isEmpty()) {
+            Notifications.getInstance().show(Notifications.Type.WARNING,
+                "Selecciona al menos un elemento para borrar");
+            return;
+        }
+
+        DeleteOrderForm dialog = new DeleteOrderForm(list);
+        DefaultOption option = new DefaultOption() {
+            @Override
+            public boolean closeWhenClickOutside() {
+                return true;
+            }
+        };
+        GlassPanePopup.showPopup(
+            new SimplePopupBorder(
+                dialog,
+                "¿Estás seguro?"), option);
+    }//GEN-LAST:event_actionButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ui.components.ActionButton actionButton1;
@@ -294,7 +365,7 @@ public class OrderPage extends SimpleForm {
     private javax.swing.JLabel lbTitle;
     private javax.swing.JPanel panel;
     private javax.swing.JScrollPane scroll;
-    private javax.swing.JTable table;
+    public static final javax.swing.JTable table = new javax.swing.JTable();
     private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }

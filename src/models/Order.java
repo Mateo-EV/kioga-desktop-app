@@ -1,31 +1,36 @@
 package models;
 
 import java.text.NumberFormat;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-import java.util.Queue;
 
 public class Order extends TimeStamps {
+
     private int id;
     private String code;
     private double amount;
-    private Customer user;
+    private Customer customer;
     private OrderStatus status;
-    private Queue<OrderProduct> orderProducts = new LinkedList<>();
+    private final List<OrderProduct> details = new ArrayList<>();
     private double shipping_amount;
     private boolean is_delivery;
     private Address address;
     private String notes;
 
-    private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("es", "PE"));
-    
-    public Order() {}
+    private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(
+        new Locale("es", "PE"));
 
-    public Order(int id, String code, double amount, Customer user, OrderStatus status, double shipping_amount, boolean is_delivery, Address address, String notes) {
+    public Order() {
+    }
+
+    public Order(int id, String code, double amount, Customer customer,
+        OrderStatus status, double shipping_amount, boolean is_delivery,
+        Address address, String notes) {
         this.id = id;
         this.code = code;
         this.amount = amount;
-        this.user = user;
+        this.customer = customer;
         this.status = status;
         this.shipping_amount = shipping_amount;
         this.is_delivery = is_delivery;
@@ -44,7 +49,7 @@ public class Order extends TimeStamps {
     public double getAmount() {
         return amount;
     }
-    
+
     public String getAmountFormatted() {
         return currencyFormat.format(amount);
     }
@@ -53,12 +58,12 @@ public class Order extends TimeStamps {
         this.amount = amount;
     }
 
-    public Customer getUser() {
-        return user;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setUser(Customer user) {
-        this.user = user;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     public OrderStatus getStatus() {
@@ -69,18 +74,14 @@ public class Order extends TimeStamps {
         this.status = status;
     }
 
-    public Queue<OrderProduct> getOrderProducts() {
-        return orderProducts;
-    }
-
-    public void setOrderProducts(Queue<OrderProduct> orderProducts) {
-        this.orderProducts = orderProducts;
+    public List<OrderProduct> getDetails() {
+        return details;
     }
 
     public double getShippingAmount() {
         return shipping_amount;
     }
-    
+
     public String getShippingAmountFormatted() {
         return currencyFormat.format(shipping_amount);
     }

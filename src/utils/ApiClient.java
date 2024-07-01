@@ -53,7 +53,6 @@ public class ApiClient {
 
         try (Response response = client.newCall(request).execute()) {
             String bodyString = response.body().string();
-            System.out.println(bodyString);
             Type type = new TypeToken<HashMap<String, Object>>() {
             }.getType();
             if (!response.isSuccessful()) {

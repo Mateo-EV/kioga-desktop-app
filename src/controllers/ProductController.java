@@ -8,6 +8,7 @@ import models.Category;
 import models.Product;
 import utils.ApiClient;
 import utils.BackgroundSwingWorker;
+import utils.GlobalCacheState;
 
 public class ProductController implements ModelController<Product> {
 
@@ -25,6 +26,15 @@ public class ProductController implements ModelController<Product> {
 
     @Override
     public void findAll(ApiClient.onResponse onResponse) {
+        if (!GlobalCacheState.getProducts().isEmpty()) {
+            onResponse.onSuccess(new ApiClient.ApiResponse(
+                ApiClient.ResponseType.SUCCESS,
+                null,
+                GlobalCacheState.getProducts()
+            ));
+            return;
+        }
+
         new BackgroundSwingWorker(
             "/admin/products",
             "GET",
@@ -33,7 +43,7 @@ public class ProductController implements ModelController<Product> {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 List<Map<String, Object>> productsMap = (List<Map<String, Object>>) apiResponse.getData();
-                List<Product> products = new ArrayList();
+                List<Product> products = GlobalCacheState.getProducts();
                 for (Map<String, Object> productMap : productsMap) {
                     Product product = new Product();
                     product.setId(((Number) productMap.get("id")).intValue());
