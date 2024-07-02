@@ -4,23 +4,34 @@
  */
 package models;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author intel
  */
-public class Category {
+public class Category extends TimeStamps implements Identifiable {
+
     private int id;
     private String name;
     private String image;
+    private File imageFile;
+    private String slug;
+    private final List<Subcategory> subcategories = new ArrayList<>();
 
-    public Category() {}
-    
-    public Category(int id, String name, String image) {
+    public Category() {
+    }
+
+    public Category(int id, String name, String slug, String image) {
         this.id = id;
         this.name = name;
         this.image = image;
+        this.slug = slug;
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -45,5 +56,24 @@ public class Category {
         this.image = image;
     }
 
-    
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public List<Subcategory> getSubcategories() {
+        return subcategories;
+    }
+
+    public File getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(File imageFile) {
+        this.imageFile = imageFile;
+    }
+
 }

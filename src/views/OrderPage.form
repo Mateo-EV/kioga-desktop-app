@@ -39,7 +39,9 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="txtSearch" min="-2" pref="228" max="-2" attributes="0"/>
-                          <EmptySpace pref="414" max="32767" attributes="0"/>
+                          <EmptySpace pref="354" max="32767" attributes="0"/>
+                          <Component id="btnPending" min="-2" pref="48" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="actionButton2" min="-2" pref="128" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="actionButton3" min="-2" pref="128" max="-2" attributes="0"/>
@@ -63,6 +65,7 @@
                           <Component id="actionButton1" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                           <Component id="actionButton2" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                           <Component id="actionButton3" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
+                          <Component id="btnPending" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -189,6 +192,14 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Editar"/>
           </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ui.components.ActionButton(ActionButton.SECONDARY)"/>
+          </AuxValues>
+        </Component>
+        <Component class="ui.components.ActionButton" name="btnPending">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPendingActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ui.components.ActionButton(ActionButton.SECONDARY)"/>
           </AuxValues>

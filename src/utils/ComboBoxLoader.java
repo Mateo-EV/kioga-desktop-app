@@ -4,22 +4,22 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingWorker;
+import models.Identifiable;
+import utils.structure.ArbolBinario;
 
-public class ComboBoxLoader<T> extends SwingWorker<Void, T> {
+public class ComboBoxLoader<T extends Identifiable> extends SwingWorker<Void, T> {
 
     private final DefaultComboBoxModel<T> model;
-    private final List<T> items;
+    private final ArbolBinario<T> tree;
 
-    public ComboBoxLoader(DefaultComboBoxModel<T> model, List<T> items) {
+    public ComboBoxLoader(DefaultComboBoxModel<T> model, ArbolBinario<T> tree) {
         this.model = model;
-        this.items = items;
+        this.tree = tree;
     }
 
     @Override
     protected Void doInBackground() {
-        for (T item : items) {
-            publish(item);
-        }
+        tree.forEach(this::publish);
         return null;
     }
 
@@ -39,8 +39,8 @@ public class ComboBoxLoader<T> extends SwingWorker<Void, T> {
         }
     }
 
-    public static <T> void loadItems(DefaultComboBoxModel<T> model,
-        List<T> items) {
-        new ComboBoxLoader<>(model, items).execute();
+    public static <T extends Identifiable> void loadItems(
+        DefaultComboBoxModel<T> model, ArbolBinario<T> tree) {
+        new ComboBoxLoader<>(model, tree).execute();
     }
 }

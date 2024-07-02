@@ -3,7 +3,7 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Customer extends TimeStamps {
+public class Customer extends TimeStamps implements Identifiable {
 
     private int id;
     private String name;
@@ -30,6 +30,7 @@ public class Customer extends TimeStamps {
         this.addresses = new ArrayList();
     }
 
+    @Override
     public int getId() {
         return id;
     }

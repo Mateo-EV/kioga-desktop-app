@@ -2,23 +2,24 @@ package controllers;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import models.Address;
 import models.Customer;
 import models.Order;
+import models.OrderProduct;
 import models.OrderStatus;
 import models.Product;
 import models.Sale;
 import utils.ApiClient;
 import utils.BackgroundSwingWorker;
 import utils.GlobalCacheState;
+import utils.structure.ArbolBinario;
 import utils.structure.Cola;
 
 public class OrderController implements ModelController<Order> {
 
-    static private OrderController instance = new OrderController();
+    private static final OrderController instance = new OrderController();
 
     static public OrderController getInstance() {
         return instance;
@@ -29,6 +30,7 @@ public class OrderController implements ModelController<Order> {
         order.setId(((Number) orderMap.get("id")).intValue());
         order.setCode((String) orderMap.get("code"));
         order.setAmount((double) orderMap.get("amount"));
+        order.setIsDelivery((boolean) orderMap.get("is_delivery"));
         order.setStatus(OrderStatus.fromString(
             (String) orderMap.get("status")));
         order.setShippingAmount((double) orderMap.get(
@@ -44,10 +46,91 @@ public class OrderController implements ModelController<Order> {
         return order;
     }
 
+    static public OrderProduct transcriptDetail(Map<String, Object> detailsMap) {
+        OrderProduct detail = new OrderProduct();
+        detail.setQuantity(((Number) detailsMap.get("quantity")).intValue());
+        detail.setUnitAmount((double) detailsMap.get("unit_amount"));
+
+        return detail;
+    }
+
+    static public Address transcriptAddress(Map<String, Object> addressMap,
+        Customer customer) {
+        return new Address(
+            ((Number) addressMap.get("id")).intValue(),
+            customer,
+            (String) addressMap.get("first_name"),
+            (String) addressMap.get("last_name"),
+            (String) addressMap.get("dni"),
+            (String) addressMap.get("phone"),
+            (String) addressMap.get("department"),
+            (String) addressMap.get("province"),
+            (String) addressMap.get("district"),
+            (String) addressMap.get("street_address"),
+            (String) addressMap.get("zip_code"),
+            (String) addressMap.get("reference")
+        );
+    }
+
     @Override
     public void findById(int id,
         ApiClient.onResponse onResponse) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Order order_cached = GlobalCacheState.getOrders().find(id);
+        if (order_cached != null && order_cached.getAddress() != null
+            && order_cached.getDetails() != null
+            && order_cached.getCustomer() != null) {
+            onResponse.onSuccess(new ApiClient.ApiResponse(
+                ApiClient.ResponseType.SUCCESS,
+                null,
+                order_cached
+            ));
+        }
+
+        new BackgroundSwingWorker(
+            "/admin/orders/" + id,
+            "GET",
+            null,
+            new ApiClient.onResponse() {
+            @Override
+            public void onSuccess(ApiClient.ApiResponse apiResponse) {
+                Map<String, Object> ordersMap = (Map<String, Object>) apiResponse.getData();
+
+                Order order = transcriptOrder(ordersMap);
+                List<Map<String, Object>> detailsMap = (List<Map<String, Object>>) ordersMap.get(
+                    "details");
+
+                Customer customer = CustomerController.transcriptCustomer(
+                    (Map<String, Object>) ordersMap.get("user"));
+
+                Address address = transcriptAddress(
+                    (Map<String, Object>) ordersMap.get("address"), customer);
+
+                order.setAddress(address);
+                order.setCustomer(customer);
+                for (Map<String, Object> detailMap : detailsMap) {
+                    OrderProduct detail = transcriptDetail(detailMap);
+                    Product product = ProductController.transcriptProduct(
+                        (Map<String, Object>) detailMap.get("product"));
+                    detail.setProduct(product);
+                    order.getDetails().add(detail);
+                }
+
+                GlobalCacheState.getOrders().update(order);
+
+                onResponse.onSuccess(new ApiClient.ApiResponse(
+                    ApiClient.ResponseType.SUCCESS,
+                    null,
+                    order
+                ));
+            }
+
+            @Override
+            public void onError(ApiClient.ApiResponse apiResponse) {
+                onResponse.onError(apiResponse);
+            }
+        },
+            false
+        ).execute();
     }
 
     @Override
@@ -69,9 +152,9 @@ public class OrderController implements ModelController<Order> {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 List<Map<String, Object>> ordersMap = (List<Map<String, Object>>) apiResponse.getData();
-                List<Order> orders = GlobalCacheState.getOrders();
+                ArbolBinario<Order> orders = GlobalCacheState.getOrders();
                 for (Map<String, Object> orderMap : ordersMap) {
-                    orders.add(transcriptOrder(orderMap));
+                    orders.insert(transcriptOrder(orderMap));
                 }
                 onResponse.onSuccess(new ApiClient.ApiResponse(
                     ApiClient.ResponseType.SUCCESS,
@@ -117,7 +200,7 @@ public class OrderController implements ModelController<Order> {
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 Map<String, Object> orderMap = (Map<String, Object>) apiResponse.getData();
 
-                GlobalCacheState.getOrders().add(0, transcriptOrder(orderMap));
+                GlobalCacheState.getOrders().insert(transcriptOrder(orderMap));
                 GlobalCacheState.syncOrders();
 
                 onResponse.onSuccess(new ApiClient.ApiResponse(
@@ -141,11 +224,29 @@ public class OrderController implements ModelController<Order> {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    @Override
-    public void update(Order order,
-        String field,
+    public void updateStatus(Order order,
         ApiClient.onResponse onResponse) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        Map<String, Object> statusMap = new HashMap<>();
+        statusMap.put("status", order.getStatus().getValue());
+
+        new BackgroundSwingWorker("/admin/orders/status/" + order.getId(),
+            "POST",
+            statusMap, new ApiClient.onResponse() {
+            @Override
+            public void onSuccess(ApiClient.ApiResponse apiResponse) {
+                GlobalCacheState.syncOrders();
+                onResponse.onSuccess(new ApiClient.ApiResponse(
+                    ApiClient.ResponseType.SUCCESS,
+                    null,
+                    null
+                ));
+            }
+
+            @Override
+            public void onError(ApiClient.ApiResponse apiResponse) {
+                onResponse.onError(apiResponse);
+            }
+        }, false).execute();
     }
 
     @Override
@@ -155,15 +256,7 @@ public class OrderController implements ModelController<Order> {
             new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
-                Iterator<Order> iterator = GlobalCacheState.getOrders().iterator();
-                while (iterator.hasNext()) {
-                    Order order = iterator.next();
-                    if (order.getId() == id) {
-                        iterator.remove();
-                        break;
-                    }
-                }
-
+                GlobalCacheState.getOrders().delete(id);
                 GlobalCacheState.syncOrders();
 
                 onResponse.onSuccess(new ApiClient.ApiResponse(
@@ -203,62 +296,26 @@ public class OrderController implements ModelController<Order> {
                 Object[] response = (Object[]) apiResponse.getData();
                 List<Map<String, Object>> customersMap = (List<Map<String, Object>>) response[0];
                 List<Map<String, Object>> productsMap = (List<Map<String, Object>>) response[1];
-                List<Customer> customers = GlobalCacheState.getCustomers();
+
+                ArbolBinario<Customer> customers = GlobalCacheState.getCustomers();
                 for (Map<String, Object> customerMap : customersMap) {
-                    Customer customer = new Customer(
-                        ((Number) customerMap.get("id")).intValue(),
-                        (String) customerMap.get("name"),
-                        (String) customerMap.get("email")
-                    );
-                    customer.setCreatedAtFromTimeStamp((String) customerMap.get(
-                        "created_at"));
-                    customer.setUpdatedAtFromTimeStamp((String) customerMap.get(
-                        "updated_at"));
+                    Customer customer = CustomerController.transcriptCustomer(
+                        customerMap);
                     List<Map<String, Object>> adressesesMap = (List<Map<String, Object>>) customerMap.get(
                         "addresses"
                     );
-
                     List<Address> adresseses = customer.getAddresses();
                     for (Map<String, Object> addressMap : adressesesMap) {
-                        adresseses.add(new Address(
-                            ((Number) addressMap.get("id")).intValue(),
-                            customer,
-                            (String) addressMap.get("first_name"),
-                            (String) addressMap.get("last_name"),
-                            (String) addressMap.get("dni"),
-                            (String) addressMap.get("phone"),
-                            (String) addressMap.get("department"),
-                            (String) addressMap.get("province"),
-                            (String) addressMap.get("district"),
-                            (String) addressMap.get("street_address"),
-                            (String) addressMap.get("zip_code"),
-                            (String) addressMap.get("reference")
-                        ));
+                        adresseses.add(transcriptAddress(addressMap, customer));
                     }
-                    customers.add(customer);
+                    customers.insert(customer);
                 }
 
-                List<Product> products = GlobalCacheState.getProducts();
+                ArbolBinario<Product> products = GlobalCacheState.getProducts();
                 for (Map<String, Object> productMap : productsMap) {
-                    Product product = new Product();
-                    product.setId(((Number) productMap.get("id")).intValue());
-                    product.setName((String) productMap.get("name"));
-                    product.setImage((String) productMap.get("image"));
-                    product.setSlug((String) productMap.get("slug"));
-                    product.setDescription(
-                        (String) productMap.get("description"));
-                    product.setPrice((double) productMap.get("price"));
-                    product.setDiscount((double) productMap.get("discount"));
-                    product.setPriceDiscounted((double) productMap.get(
-                        "price_discounted"));
-                    product.setStock(
-                        ((Number) productMap.get("stock")).intValue());
-                    product.setIsActive((boolean) productMap.get("is_active"));
-                    product.setCreatedAtFromTimeStamp((String) productMap.get(
-                        "created_at"));
-                    product.setUpdatedAtFromTimeStamp((String) productMap.get(
-                        "updated_at"));
-                    products.add(product);
+                    Product product = ProductController.transcriptProduct(
+                        productMap);
+                    products.insert(product);
                 }
 
                 Object responses[] = {customers, products};
@@ -275,7 +332,15 @@ public class OrderController implements ModelController<Order> {
     }
 
     public Cola<Order> getOrdersToDelivery() {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        Cola<Order> orders = new Cola();
+        GlobalCacheState.getOrders().forEach((order) -> {
+            if (order.getStatus() == OrderStatus.PENDING) {
+                orders.enqueue(order);
+            }
+        });
+
+        return orders;
     }
 
     public List<Sale> getSales() {

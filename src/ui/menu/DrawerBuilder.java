@@ -27,7 +27,6 @@ import raven.swing.AvatarIcon;
 import views.DashboardPage;
 import views.OrderPage;
 import views.ProductPage;
-import views.ReadPage;
 
 public class DrawerBuilder extends SimpleDrawerBuilder {
 
@@ -98,13 +97,7 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
             new Item.Label("PRINCIPAL"),
             new Item("Dashboard", "dashboard.svg"),
             new Item.Label("GESTIÓN"),
-            new Item("Pedidos", "shopping-cart.svg")
-            .subMenu("General")
-            .subMenu("Pendientes")
-            .subMenu("En Espera")
-            .subMenu("Enviados")
-            .subMenu("Entregados")
-            .subMenu("Cancelados"),
+            new Item("Pedidos", "shopping-cart.svg"),
             new Item("Productos", "package.svg"),
             new Item("Categorías", "rows-3.svg"),
             new Item("Clientes", "users.svg"),
@@ -191,21 +184,16 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
                         case 0:
                             FormManager.showForm(new DashboardPage());
                             break;
+                        case 1:
+                            FormManager.showForm(new OrderPage());
+                            break;
                         case 2:
                             FormManager.showForm(new ProductPage());
                             break;
-                        case 6:
+                        case 5:
                             AuthController.logout();
                             FormManager.logout();
                             break;
-                    }
-                } else if (index.length == 2) {
-                    if (index[0] == 1) {
-                        if (index[1] == 0) {
-                            FormManager.showForm(new OrderPage());
-                        } else if (index[1] == 1) {
-                            FormManager.showForm(new ReadPage());
-                        }
                     }
                 }
             }

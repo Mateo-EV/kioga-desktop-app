@@ -1,14 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package views;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import controllers.ProductController;
 import java.awt.Color;
-import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import models.Product;
 import net.miginfocom.swing.MigLayout;
@@ -26,19 +21,13 @@ import ui.table.ImageTableRenderer;
 import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
 import utils.GlobalCacheState;
+import utils.structure.ArbolBinario;
 import views.dialog.CreateOrderForm;
 
-/**
- *
- * @author intel
- */
 public class ProductPage extends SimpleForm {
 
     private final LoadingSkeleton loadingSkeleton;
 
-    /**
-     * Creates new form OrderPage
-     */
     public ProductPage() {
         initComponents();
         setLayout(new MigLayout("wrap,fill,insets 10", "fill", "fill"));
@@ -105,9 +94,9 @@ public class ProductPage extends SimpleForm {
     public static void syncProducts() {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         tableModel.setRowCount(0);
-        for (Product product : GlobalCacheState.getProducts()) {
+        GlobalCacheState.getProducts().forEach(product -> {
             addProductToTable(product);
-        }
+        });
     }
 
     private static void addProductToTable(Product product) {
@@ -159,7 +148,7 @@ public class ProductPage extends SimpleForm {
         ProductController.getInstance().findAll(new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse response) {
-                List<Product> products = (List<Product>) response.getData();
+                ArbolBinario<Product> products = (ArbolBinario<Product>) response.getData();
                 tableModel.setRowCount(0);
                 products.forEach((product) -> addProductToTable(product));
                 showTable();
@@ -173,6 +162,7 @@ public class ProductPage extends SimpleForm {
                     response.getMessage(),
                     MessageAlerts.MessageType.ERROR
                 );
+                loadingSkeleton.stopLoading();
             }
         });
     }

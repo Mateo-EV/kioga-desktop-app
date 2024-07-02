@@ -1,28 +1,23 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package models;
 
+import java.io.File;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-/**
- *
- * @author intel
- */
-public class Product extends TimeStamps {
+public class Product extends TimeStamps implements Identifiable {
 
     private int id;
     private String name;
     private String slug;
     private String image;
+    private File imageFile;
     private String description;
     private double price;
     private double discount;
     private double price_discounted;
     private int stock;
     private Category category;
+    private Subcategory subcategory;
     private Brand brand;
     private boolean is_active;
 
@@ -31,7 +26,7 @@ public class Product extends TimeStamps {
 
     public Product(int id, String name, String slug, String description,
         String image, boolean isActive, double price, double discount, int stock,
-        Category category, Brand brand) {
+        Category category, Subcategory subcategory, Brand brand) {
         this.id = id;
         this.name = name;
         this.slug = slug;
@@ -39,13 +34,17 @@ public class Product extends TimeStamps {
         this.price = price;
         this.stock = stock;
         this.category = category;
+        this.subcategory = subcategory;
         this.brand = brand;
         this.discount = discount;
+        this.is_active = isActive;
+        this.imageFile = null;
     }
 
     private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(
         new Locale("es", "PE"));
 
+    @Override
     public int getId() {
         return id;
     }
@@ -126,7 +125,7 @@ public class Product extends TimeStamps {
         this.discount = discount;
     }
 
-    public boolean isIsActive() {
+    public boolean getIsActive() {
         return is_active;
     }
 
@@ -144,5 +143,21 @@ public class Product extends TimeStamps {
 
     public String getPriceDiscountedFormatted() {
         return currencyFormat.format(price_discounted);
+    }
+
+    public Subcategory getSubcategory() {
+        return subcategory;
+    }
+
+    public void setSubcategory(Subcategory subcategory) {
+        this.subcategory = subcategory;
+    }
+
+    public File getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(File imageFile) {
+        this.imageFile = imageFile;
     }
 }

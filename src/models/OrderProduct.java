@@ -1,28 +1,27 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package models;
 
-/**
- *
- * @author intel
- */
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class OrderProduct {
+
     private Order order;
     private Product product;
     private int quantity;
     private double unit_amount;
-    private double total_amount;
-    
-    public OrderProduct(){}
 
-    public OrderProduct(Order order, Product product, int quantity, double unit_amount, double total_amount) {
+    private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(
+        new Locale("es", "PE"));
+
+    public OrderProduct() {
+    }
+
+    public OrderProduct(Order order, Product product, int quantity,
+        double unit_amount) {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
         this.unit_amount = unit_amount;
-        this.total_amount = total_amount;
     }
 
     public Order getOrder() {
@@ -49,19 +48,15 @@ public class OrderProduct {
         this.quantity = quantity;
     }
 
-    public double getUnit_amount() {
+    public double getUnitAmount() {
         return unit_amount;
     }
 
-    public void setUnit_amount(double unit_amount) {
+    public void setUnitAmount(double unit_amount) {
         this.unit_amount = unit_amount;
     }
 
-    public double getTotal_amount() {
-        return total_amount;
-    }
-
-    public void setTotal_amount(double total_amount) {
-        this.total_amount = total_amount;
+    public String getUnitAmountFormatted() {
+        return currencyFormat.format(unit_amount);
     }
 }

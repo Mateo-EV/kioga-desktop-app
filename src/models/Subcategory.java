@@ -8,17 +8,20 @@ package models;
  *
  * @author intel
  */
-public class Subcategory {
+public class Subcategory extends TimeStamps {
+
     private int id;
     private String name;
-    private Category cateogory;
+    private String slug;
+    private Category category;
 
-    public Subcategory() {}
+    public Subcategory() {
+    }
 
-    public Subcategory(int id, String name, Category cateogory) {
+    public Subcategory(int id, String name, String slug, Category cateogory) {
         this.id = id;
         this.name = name;
-        this.cateogory = cateogory;
+        this.category = cateogory;
     }
 
     public int getId() {
@@ -37,11 +40,19 @@ public class Subcategory {
         this.name = name;
     }
 
-    public Category getCateogory() {
-        return cateogory;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setCateogory(Category cateogory) {
-        this.cateogory = cateogory;
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 }

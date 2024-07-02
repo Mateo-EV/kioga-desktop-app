@@ -4,8 +4,7 @@
  */
 package controllers;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import models.Customer;
 import utils.ApiClient;
 
@@ -13,9 +12,22 @@ import utils.ApiClient;
  *
  * @author intel
  */
-public class CustomerController implements ModelController<Customer>{
-    static List<Customer> customers = new ArrayList();
-    
+public class CustomerController implements ModelController<Customer> {
+
+    static public Customer transcriptCustomer(Map<String, Object> customerMap) {
+        Customer customer = new Customer(
+            ((Number) customerMap.get("id")).intValue(),
+            (String) customerMap.get("name"),
+            (String) customerMap.get("email")
+        );
+        customer.setCreatedAtFromTimeStamp((String) customerMap.get(
+            "created_at"));
+        customer.setUpdatedAtFromTimeStamp((String) customerMap.get(
+            "updated_at"));
+
+        return customer;
+    }
+
     @Override
     public void findById(int id, ApiClient.onResponse onResponse) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -23,7 +35,7 @@ public class CustomerController implements ModelController<Customer>{
 
     @Override
     public void findAll(ApiClient.onResponse onResponse) {
-        
+
     }
 
     @Override
@@ -37,15 +49,10 @@ public class CustomerController implements ModelController<Customer>{
     }
 
     @Override
-    public void update(Customer customer, String field, ApiClient.onResponse onResponse) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
     public void delete(int id, ApiClient.onResponse onResponse) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
     public Customer findByEmail(String email) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

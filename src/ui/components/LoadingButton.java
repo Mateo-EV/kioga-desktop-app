@@ -6,24 +6,26 @@ import java.awt.FlowLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class LoadingButton extends ActionButton  {
+public class LoadingButton extends ActionButton {
+
     private LoadingSpinner loadingSpinner;
     private JPanel contentPanel;
     private JLabel textLabel;
-    
+
     public LoadingButton(String text) {
         super();
         init(text);
     }
-    
+
     public LoadingButton(String text, int type) {
         super(type);
         init(text);
     }
-    
+
     private void init(String text) {
         textLabel = new JLabel(text);
-        textLabel.putClientProperty(FlatClientProperties.STYLE, "font:$semibold.font;");
+        textLabel.putClientProperty(FlatClientProperties.STYLE,
+            "font:$semibold.font;");
         contentPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
         contentPanel.setOpaque(false);
 
@@ -46,5 +48,10 @@ public class LoadingButton extends ActionButton  {
         loadingSpinner.setVisible(false);
         loadingSpinner.stop();
         setEnabled(true);
+    }
+    
+    @Override
+    public void setText(String text) {
+        textLabel.setText(text);
     }
 }

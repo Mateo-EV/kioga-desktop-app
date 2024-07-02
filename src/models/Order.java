@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class Order extends TimeStamps {
+public class Order extends TimeStamps implements Identifiable {
 
     private int id;
     private String code;
@@ -38,6 +38,7 @@ public class Order extends TimeStamps {
         this.notes = notes;
     }
 
+    @Override
     public int getId() {
         return id;
     }

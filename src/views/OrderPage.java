@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package views;
 
 import com.formdev.flatlaf.FlatClientProperties;
@@ -30,20 +26,16 @@ import ui.table.CheckBoxTableHeaderRenderer;
 import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
 import utils.GlobalCacheState;
+import utils.structure.ArbolBinario;
+import utils.structure.Cola;
 import views.dialog.CreateOrderForm;
 import views.dialog.DeleteOrderForm;
+import views.dialog.ViewPendingOrderForm;
 
-/**
- *
- * @author intel
- */
 public class OrderPage extends SimpleForm {
 
     private final LoadingSkeleton loadingSkeleton;
 
-    /**
-     * Creates new form OrderPage
-     */
     public OrderPage() {
         initComponents();
         setLayout(new MigLayout("wrap,fill,insets 10", "fill", "fill"));
@@ -65,6 +57,8 @@ public class OrderPage extends SimpleForm {
             "font:+5;"
             + "font:bold +5"
         );
+
+        btnPending.setIcon(new FlatSVGIcon("resources/menu/calendar.svg"));
 
         txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
             "Buscar pedidos");
@@ -148,9 +142,9 @@ public class OrderPage extends SimpleForm {
     public static void syncOrders() {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         tableModel.setRowCount(0);
-        for (Order order : GlobalCacheState.getOrders()) {
+        GlobalCacheState.getOrders().forEach(order -> {
             addOrderToTable(order);
-        }
+        });
     }
 
     private static void addOrderToTable(Order order) {
@@ -172,7 +166,7 @@ public class OrderPage extends SimpleForm {
         OrderController.getInstance().findAll(new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse response) {
-                List<Order> orders = (List<Order>) response.getData();
+                ArbolBinario<Order> orders = (ArbolBinario<Order>) response.getData();
                 tableModel.setRowCount(0);
                 orders.forEach((order) -> addOrderToTable(order));
                 showTable();
@@ -186,6 +180,7 @@ public class OrderPage extends SimpleForm {
                     response.getMessage(),
                     MessageAlerts.MessageType.ERROR
                 );
+                loadingSkeleton.stopLoading();
             }
         });
     }
@@ -218,6 +213,7 @@ public class OrderPage extends SimpleForm {
         actionButton1 = new ui.components.ActionButton(ActionButton.DESTRUCTIVE);
         actionButton2 = new ui.components.ActionButton();
         actionButton3 = new ui.components.ActionButton(ActionButton.SECONDARY);
+        btnPending = new ui.components.ActionButton(ActionButton.SECONDARY);
 
         setLayout(null);
 
@@ -277,6 +273,12 @@ public class OrderPage extends SimpleForm {
 
         actionButton3.setText("Editar");
 
+        btnPending.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPendingActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
         panel.setLayout(panelLayout);
         panelLayout.setHorizontalGroup(
@@ -291,7 +293,9 @@ public class OrderPage extends SimpleForm {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(panelLayout.createSequentialGroup()
                         .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 414, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 354, Short.MAX_VALUE)
+                        .addComponent(btnPending, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(actionButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(actionButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -310,7 +314,8 @@ public class OrderPage extends SimpleForm {
                     .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(actionButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(actionButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(actionButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(actionButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnPending, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(4, 4, 4)
@@ -357,10 +362,33 @@ public class OrderPage extends SimpleForm {
                 "¿Estás seguro?"), option);
     }//GEN-LAST:event_actionButton1ActionPerformed
 
+    private void btnPendingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPendingActionPerformed
+        Cola<Order> pendingOrders = OrderController.getInstance().getOrdersToDelivery();
+        if (pendingOrders.isEmpty()) {
+            Notifications.getInstance().show(
+                Notifications.Type.INFO,
+                "No hay más pedidos pendientes"
+            );
+            return;
+        }
+
+        ViewPendingOrderForm dialog = new ViewPendingOrderForm(pendingOrders);
+        GlassPanePopup.showPopup(
+            new SimplePopupBorder(
+                dialog,
+                "Pedidos Pendientes"), new DefaultOption() {
+            @Override
+            public boolean closeWhenClickOutside() {
+                return true;
+            }
+        });
+    }//GEN-LAST:event_btnPendingActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ui.components.ActionButton actionButton1;
     private ui.components.ActionButton actionButton2;
     private ui.components.ActionButton actionButton3;
+    private ui.components.ActionButton btnPending;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JPanel panel;

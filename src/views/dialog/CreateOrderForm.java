@@ -37,6 +37,7 @@ import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
 import utils.ComboBoxLoader;
 import utils.GlobalCacheState;
+import utils.structure.ArbolBinario;
 
 /**
  *
@@ -62,16 +63,16 @@ public class CreateOrderForm extends javax.swing.JPanel {
 
     static public void syncCustomers() {
         customersModel.removeAllElements();
-        for (Customer customer : GlobalCacheState.getCustomers()) {
+        GlobalCacheState.getCustomers().forEach(customer -> {
             customersModel.addElement(customer);
-        }
+        });
     }
 
     static public void syncProducts() {
         productsModel.removeAllElements();
-        for (Product product : GlobalCacheState.getProducts()) {
+        GlobalCacheState.getProducts().forEach(product -> {
             productsModel.addElement(product);
-        }
+        });
     }
 
     private void initcbModels() {
@@ -223,8 +224,8 @@ public class CreateOrderForm extends javax.swing.JPanel {
                 public void onSuccess(ApiClient.ApiResponse apiResponse) {
                     System.out.println(apiResponse.getData());
                     Object responses[] = (Object[]) apiResponse.getData();
-                    List<Customer> customers = (List<Customer>) responses[0];
-                    List<Product> products = (List<Product>) responses[1];
+                    ArbolBinario<Customer> customers = (ArbolBinario<Customer>) responses[0];
+                    ArbolBinario<Product> products = (ArbolBinario<Product>) responses[1];
 
                     ComboBoxLoader.loadItems(customersModel, customers);
                     ComboBoxLoader.loadItems(productsModel, products);
@@ -303,7 +304,6 @@ public class CreateOrderForm extends javax.swing.JPanel {
                 .reduce(0.0, Double::sum);
 
         txtSubtotal.setEnabled(true);
-//        txtSubtotal.setText(String.valueOf(subTotal));
         txtSubtotal.setValue(subTotal);
         txtSubtotal.setEnabled(false);
 
@@ -618,7 +618,9 @@ public class CreateOrderForm extends javax.swing.JPanel {
                     (address) -> address.getDepartment() == null
                 )
                 .toList();
-        ComboBoxLoader.loadItems(addressesModel, addressesFiltered);
+        addressesFiltered.forEach((address) -> {
+            addressesModel.addElement(address);
+        });
 
         lbEnvio.setVisible(false);
         lbSubtotal.setVisible(false);
@@ -637,7 +639,9 @@ public class CreateOrderForm extends javax.swing.JPanel {
                     (address) -> address.getDepartment() != null
                 )
                 .toList();
-        ComboBoxLoader.loadItems(addressesModel, addressesFiltered);
+        addressesFiltered.forEach((address) -> {
+            addressesModel.addElement(address);
+        });
 
         lbEnvio.setVisible(true);
         lbSubtotal.setVisible(true);
@@ -662,7 +666,9 @@ public class CreateOrderForm extends javax.swing.JPanel {
                 )
                 .toList();
 
-        ComboBoxLoader.loadItems(addressesModel, addressesFiltered);
+        addressesFiltered.forEach((address) -> {
+            addressesModel.addElement(address);
+        });
     }//GEN-LAST:event_cbCustomersActionPerformed
 
     private void btnaddprodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnaddprodActionPerformed
