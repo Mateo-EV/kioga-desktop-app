@@ -13,14 +13,17 @@ import java.text.NumberFormat;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
 import javax.swing.AbstractButton;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 import models.Address;
 import models.Customer;
+import models.Identifiable;
 import models.Order;
 import models.OrderProduct;
 import models.OrderStatus;
@@ -40,13 +43,14 @@ import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
 import utils.ComboBoxLoader;
 import utils.GlobalCacheState;
+import utils.ServiceWorker;
 import utils.structure.ArbolBinario;
 
 /**
  *
  * @author intel
  */
-public class CreateOrderForm extends javax.swing.JPanel {
+public class EditOrderForm extends javax.swing.JPanel {
 
     private static final DefaultComboBoxModel<Customer> customersModel = new DefaultComboBoxModel();
     private static final DefaultComboBoxModel<Product> productsModel = new DefaultComboBoxModel();
@@ -55,14 +59,24 @@ public class CreateOrderForm extends javax.swing.JPanel {
 
     private final DefaultComboBoxModel<Address> addressesModel = new DefaultComboBoxModel();
 
-    private final Order orderToSave = new Order();
+    private Order orderLoaded;
+    private final Order orderToUpdate = new Order();
     private Address newAddress;
 
-    public CreateOrderForm() {
+    private final JPanel loadingPanel = new JPanel();
+
+    private final LoadingSkeleton skeletons[] = {
+        new LoadingSkeleton(),
+        new LoadingSkeleton(),
+        new LoadingSkeleton(),
+        new LoadingSkeleton(),
+        new LoadingSkeleton(),};
+
+    public EditOrderForm(int orderId) {
         initComponents();
         initcbModels();
         initTableModel();
-        init();
+        init(orderId);
     }
 
     static public void syncCustomers() {
@@ -168,7 +182,7 @@ public class CreateOrderForm extends javax.swing.JPanel {
                 }
                 int newValue = value + 1;
 
-                orderToSave.getDetails().get(row).setQuantity(newValue);
+                orderToUpdate.getDetails().get(row).setQuantity(newValue);
                 tableModel.setValueAt(String.valueOf(newValue), row, 3);
 
                 updateTotalField();
@@ -184,7 +198,7 @@ public class CreateOrderForm extends javax.swing.JPanel {
                 }
                 int newValue = value + 1;
 
-                orderToSave.getDetails().get(row).setQuantity(newValue);
+                orderToUpdate.getDetails().get(row).setQuantity(newValue);
                 tableModel.setValueAt(String.valueOf(newValue), row, 3);
 
                 updateTotalField();
@@ -192,7 +206,7 @@ public class CreateOrderForm extends javax.swing.JPanel {
 
             @Override
             public void delete(int row) {
-                orderToSave.getDetails().remove(row);
+                orderToUpdate.getDetails().remove(row);
                 tableModel.removeRow(row);
 
                 updateTotalField();
@@ -201,9 +215,34 @@ public class CreateOrderForm extends javax.swing.JPanel {
         }, table));
     }
 
-    private void init() {
+    private void showLoadingState() {
+        CardLayout ly = (CardLayout) getLayout();
+        for (LoadingSkeleton skeleton : skeletons) {
+            skeleton.startLoading();
+        }
+        ly.show(this, "form-loading");
+    }
 
-        JPanel loadingPanel = new JPanel();
+    private void stopLoadingState() {
+        CardLayout ly = (CardLayout) getLayout();
+        ly.show(this, "form-loaded");
+        for (LoadingSkeleton skeleton : skeletons) {
+            skeleton.stopLoading();
+        }
+        loadingPanel.removeAll();
+    }
+
+    public void selectItemById(JComboBox comboBox, int id) {
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            Identifiable item = (Identifiable) comboBox.getItemAt(i);
+            if (item.getId() == id) {
+                comboBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+
+    private void initLayoutForLoading() {
         loadingPanel.setLayout(
             new MigLayout(
                 "wrap,fill,insets 20 50 20 50,gap 20",
@@ -211,23 +250,23 @@ public class CreateOrderForm extends javax.swing.JPanel {
                 "fill"
             )
         );
-        LoadingSkeleton skeletons[] = {
-            new LoadingSkeleton(),
-            new LoadingSkeleton(),
-            new LoadingSkeleton(),
-            new LoadingSkeleton(),
-            new LoadingSkeleton(),};
+
         for (LoadingSkeleton skeleton : skeletons) {
-            skeleton.startLoading();
             loadingPanel.add(skeleton);
         }
 
         add(loadingPanel, "form-loading");
-        CardLayout ly = (CardLayout) getLayout();
-        JPanel parent = this;
-        ly.show(parent, "form-loading");
+    }
 
-        if (customersModel.getSize() == 0 || productsModel.getSize() == 0) {
+    private void init(int orderId) {
+
+        initLayoutForLoading();
+
+        showLoadingState();
+        btnMangeAddress.setText("");
+        btnMangeAddress.setIcon(new FlatSVGIcon("resources/icon/eye.svg"));
+        ServiceWorker.execute(() -> {
+            CountDownLatch latch = new CountDownLatch(2);
             OrderController.getInstance().getDataToSave(
                 new ApiClient.onResponse() {
                 @Override
@@ -239,20 +278,12 @@ public class CreateOrderForm extends javax.swing.JPanel {
 
                     ComboBoxLoader.loadItems(customersModel, customers);
                     ComboBoxLoader.loadItems(productsModel, products);
-
-                    ly.show(parent, "form-loaded");
-                    for (LoadingSkeleton skeleton : skeletons) {
-                        skeleton.stopLoading();
-                    }
-                    loadingPanel.removeAll();
+                    latch.countDown();
                 }
 
                 @Override
                 public void onError(ApiClient.ApiResponse apiResponse) {
-                    for (LoadingSkeleton skeleton : skeletons) {
-                        skeleton.stopLoading();
-                    }
-                    loadingPanel.removeAll();
+                    latch.countDown();
                     GlassPanePopup.closePopupLast();
                     Notifications.getInstance().show(
                         Notifications.Type.ERROR,
@@ -260,13 +291,41 @@ public class CreateOrderForm extends javax.swing.JPanel {
                     );
                 }
             });
-        } else {
-            ly.show(parent, "form-loaded");
-            for (LoadingSkeleton skeleton : skeletons) {
-                skeleton.stopLoading();
+
+            OrderController.getInstance().findById(orderId,
+                new ApiClient.onResponse() {
+                @Override
+                public void onSuccess(ApiClient.ApiResponse apiResponse) {
+                    orderLoaded = (Order) apiResponse.getData();
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(ApiClient.ApiResponse apiResponse) {
+                    latch.countDown();
+                    GlassPanePopup.closePopupLast();
+                    Notifications.getInstance().show(
+                        Notifications.Type.ERROR,
+                        apiResponse.getMessage()
+                    );
+                }
+            });
+
+            try {
+                latch.await();
+                stopLoadingState();
+                selectItemById(cbCustomers, orderLoaded.getCustomer().getId());
+                for (OrderProduct detail : orderLoaded.getDetails()) {
+                    addDetail(detail);
+                }
+            } catch (InterruptedException ex) {
+                GlassPanePopup.closePopupLast();
+                Notifications.getInstance().show(
+                    Notifications.Type.ERROR,
+                    "Algo malo ocurrió"
+                );
             }
-            loadingPanel.removeAll();
-        }
+        });
 
         LoadingButton saveBtn = new LoadingButton("Guardar");
         ActionButton cancelBtn = new ActionButton("Cancelar",
@@ -278,7 +337,7 @@ public class CreateOrderForm extends javax.swing.JPanel {
             GlassPanePopup.closePopupLast();
         });
         saveBtn.addActionListener((e) -> {
-            Address selectedAddress = newAddress == null ? (Address) addressesModel.getSelectedItem() : newAddress;
+            Address selectedAddress = (Address) addressesModel.getSelectedItem();
             if (selectedAddress == null) {
                 Notifications.getInstance().show(Notifications.Type.ERROR,
                     "Ingresa una dirección");
@@ -286,21 +345,23 @@ public class CreateOrderForm extends javax.swing.JPanel {
             }
 
             saveBtn.startLoading();
-            orderToSave.setCustomer((Customer) customersModel.getSelectedItem());
-            orderToSave.setStatus(OrderStatus.fromString(
+            orderToUpdate.setId(orderLoaded.getId());
+            orderToUpdate.setCustomer(
+                (Customer) customersModel.getSelectedItem());
+            orderToUpdate.setStatus(OrderStatus.fromString(
                 (String) cbStatus.getModel().getSelectedItem()));
-            orderToSave.setAddress(selectedAddress);
-            orderToSave.setIsDelivery(isDelivery());
-            orderToSave.setNotes(txtNotes.getText());
+            orderToUpdate.setAddress(selectedAddress);
+            orderToUpdate.setIsDelivery(isDelivery());
+            orderToUpdate.setNotes(txtNotes.getText());
 
-            OrderController.getInstance().save(orderToSave,
+            OrderController.getInstance().update(orderToUpdate,
                 new ApiClient.onResponse() {
                 @Override
                 public void onSuccess(ApiClient.ApiResponse apiResponse) {
                     GlassPanePopup.closePopupLast();
                     Notifications.getInstance().show(
                         Notifications.Type.SUCCESS,
-                        "Pedido agregado correctamente"
+                        "Pedido actualizado correctamente"
                     );
 
                     saveBtn.stopLoading();
@@ -319,7 +380,7 @@ public class CreateOrderForm extends javax.swing.JPanel {
 
     public void updateTotalField() {
         double subTotal
-            = orderToSave.getDetails().stream()
+            = orderToUpdate.getDetails().stream()
                 .map(detail
                     -> detail.getQuantity()
                 * detail.getProduct().getPriceDiscounted())
@@ -334,29 +395,25 @@ public class CreateOrderForm extends javax.swing.JPanel {
         txtTotal.setEnabled(false);
     }
 
-    public void addDetail(Product product) {
+    public void addDetail(OrderProduct detail) {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 
-        if (orderToSave.getDetails().stream().anyMatch(
-            (detail)
-            -> detail.getProduct() == product
+        if (orderToUpdate.getDetails().stream().anyMatch(
+            (d)
+            -> d.getProduct().getId() == detail.getProduct().getId()
         )) {
             Notifications.getInstance().show(Notifications.Type.WARNING,
                 "Este producto ya ha sido agregado");
             return;
         }
 
-        OrderProduct detail = new OrderProduct();
-        detail.setProduct(product);
-        detail.setQuantity(1);
-
-        orderToSave.getDetails().add(detail);
+        orderToUpdate.getDetails().add(detail);
 
         tableModel.addRow(new Object[]{
-            product.getName(),
-            product.getImage(),
-            product.getPriceDiscountedFormatted(),
-            "1",
+            detail.getProduct().getName(),
+            detail.getProduct().getImage(),
+            detail.getUnitAmount(),
+            String.valueOf(detail.getQuantity()),
             null
         });
 
@@ -446,12 +503,6 @@ public class CreateOrderForm extends javax.swing.JPanel {
         });
 
         jLabel5.setText("Dirección");
-
-        cbAddresses.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbAddressesActionPerformed(evt);
-            }
-        });
 
         jLabel6.setText("Productos");
 
@@ -629,7 +680,6 @@ public class CreateOrderForm extends javax.swing.JPanel {
     private void rbNotDeliveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbNotDeliveryActionPerformed
         Customer customer = (Customer) customersModel.getSelectedItem();
         addressesModel.removeAllElements();
-        addressesModel.addElement(null);
         List<Address> addressesFiltered
             = customer.getAddresses().stream()
                 .filter(
@@ -651,7 +701,6 @@ public class CreateOrderForm extends javax.swing.JPanel {
     private void rbIsDeliveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbIsDeliveryActionPerformed
         Customer customer = (Customer) customersModel.getSelectedItem();
         addressesModel.removeAllElements();
-        addressesModel.addElement(null);
         List<Address> addressesFiltered
             = customer.getAddresses().stream()
                 .filter(
@@ -673,7 +722,6 @@ public class CreateOrderForm extends javax.swing.JPanel {
     private void cbCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCustomersActionPerformed
         Customer customer = (Customer) customersModel.getSelectedItem();
         addressesModel.removeAllElements();
-        addressesModel.addElement(null);
 
         boolean isDelivery = isDelivery();
         List<Address> addressesFiltered
@@ -689,10 +737,19 @@ public class CreateOrderForm extends javax.swing.JPanel {
         addressesFiltered.forEach((address) -> {
             addressesModel.addElement(address);
         });
+
+        if (orderLoaded.getCustomer() != null && customer.getId() == orderLoaded.getCustomer().getId()) {
+            selectItemById(cbAddresses, orderLoaded.getAddress().getId());
+        }
     }//GEN-LAST:event_cbCustomersActionPerformed
 
     private void btnAddDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddDetailActionPerformed
-        addDetail((Product) productsModel.getSelectedItem());
+        OrderProduct detail = new OrderProduct();
+        Product product = (Product) productsModel.getSelectedItem();
+        detail.setProduct(product);
+        detail.setQuantity(1);
+        detail.setUnitAmount(product.getPriceDiscounted());
+        addDetail(detail);
     }//GEN-LAST:event_btnAddDetailActionPerformed
 
     private void btnMangeAddressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMangeAddressActionPerformed
@@ -703,64 +760,14 @@ public class CreateOrderForm extends javax.swing.JPanel {
             }
         };
         Address addressSelected = (Address) addressesModel.getSelectedItem();
-        if (addressSelected == null) {
-            CreateVolatilAddress dialog = new CreateVolatilAddress(isDelivery());
-            GlassPanePopup.showPopup(
-                new SimplePopupBorder(
-                    dialog,
-                    "Crear dirección",
-                    new String[]{"Cerrar", "Guardar"},
-                    (pc, i) -> {
-                        if (i == 1) {
-                            Address address = dialog.getData();
-                            if (address.getFirstName().isBlank()
-                            || address.getLastName().isBlank()
-                            || address.getDni().isBlank()
-                            || address.getPhone().isBlank()) {
-                                Notifications.getInstance().show(
-                                    Notifications.Type.ERROR,
-                                    "Completa los campos");
-                                return;
-                            }
-
-                            if (isDelivery() && (address.getDepartment().isBlank()
-                            || address.getDistrict().isBlank()
-                            || address.getProvince().isBlank()
-                            || address.getStreetAddress().isBlank())) {
-                                Notifications.getInstance().show(
-                                    Notifications.Type.ERROR,
-                                    "Completa los campos");
-                                return;
-                            }
-
-                            this.newAddress = address;
-                            pc.closePopup();
-                        } else {
-                            pc.closePopup();
-                        }
-                    }), option
-            );
-        } else {
-            CreateVolatilAddress dialog = new CreateVolatilAddress(isDelivery(),
-                addressSelected);
-            GlassPanePopup.showPopup(
-                new SimplePopupBorder(
-                    dialog,
-                    "Ver dirección"), option
-            );
-        }
-
+        CreateVolatilAddress dialog = new CreateVolatilAddress(isDelivery(),
+            addressSelected);
+        GlassPanePopup.showPopup(
+            new SimplePopupBorder(
+                dialog,
+                "Ver dirección"), option
+        );
     }//GEN-LAST:event_btnMangeAddressActionPerformed
-
-    private void cbAddressesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbAddressesActionPerformed
-        if (addressesModel.getSelectedItem() == null) {
-            btnMangeAddress.setText("+");
-            btnMangeAddress.setIcon(null);
-        } else {
-            btnMangeAddress.setText("");
-            btnMangeAddress.setIcon(new FlatSVGIcon("resources/icon/eye.svg"));
-        }
-    }//GEN-LAST:event_cbAddressesActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel FooterPanel;

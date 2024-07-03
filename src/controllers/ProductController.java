@@ -175,9 +175,9 @@ public class ProductController implements ModelController<Product> {
                         "subcategories"
                     );
                     List<Subcategory> subcategories = category.getSubcategories();
-                    for (Map<String, Object> addressMap : subcategoriesMap) {
+                    for (Map<String, Object> subcategory : subcategoriesMap) {
                         subcategories.add(
-                            CategoryController.transcriptSubcategory(addressMap,
+                            CategoryController.transcriptSubcategory(subcategory,
                                 category));
                     }
                     categories.insert(category);

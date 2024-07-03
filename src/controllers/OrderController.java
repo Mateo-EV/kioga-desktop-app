@@ -180,7 +180,25 @@ public class OrderController implements ModelController<Order> {
         data.put("user_id", order.getCustomer().getId());
         data.put("is_delivery", order.getIsDelivery());
         data.put("status", order.getStatus().getValue());
-        data.put("address_id", order.getAddress().getId());
+        if (order.getAddress().getId() != 0) {
+            data.put("address_id", order.getAddress().getId());
+        } else {
+            Map<String, Object> addressData = new HashMap<>();
+            addressData.put("first_name", order.getAddress().getFirstName());
+            addressData.put("last_name", order.getAddress().getLastName());
+            addressData.put("dni", order.getAddress().getDni());
+            addressData.put("phone", order.getAddress().getPhone());
+            addressData.put("department", order.getAddress().getDepartment());
+            addressData.put("province", order.getAddress().getProvince());
+            addressData.put("district", order.getAddress().getDistrict());
+            addressData.put("street_address",
+                order.getAddress().getStreetAddress());
+            addressData.put("zip_code", order.getAddress().getZipCode());
+            addressData.put("reference", order.getAddress().getReference());
+
+            data.put("address", addressData);
+        }
+
         Map<String, Object> details[] = new Map[order.getDetails().size()];
         for (int i = 0; i < details.length; i++) {
             details[i] = new HashMap();
@@ -221,7 +239,49 @@ public class OrderController implements ModelController<Order> {
     @Override
     public void update(Order order,
         ApiClient.onResponse onResponse) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("user_id", order.getCustomer().getId());
+        data.put("is_delivery", order.getIsDelivery());
+        data.put("status", order.getStatus().getValue());
+        data.put("address_id", order.getAddress().getId());
+
+        Map<String, Object> details[] = new Map[order.getDetails().size()];
+        for (int i = 0; i < details.length; i++) {
+            details[i] = new HashMap();
+            System.out.println(order.getDetails().get(i).getQuantity());
+            details[i].put("quantity", order.getDetails().get(i).getQuantity());
+            details[i].put("product_id",
+                order.getDetails().get(i).getProduct().getId());
+        }
+        data.put("details", details);
+        data.put("notes", order.getNotes());
+
+        new BackgroundSwingWorker(
+            "/admin/orders/" + order.getId(),
+            "PUT",
+            data,
+            new ApiClient.onResponse() {
+            @Override
+            public void onSuccess(ApiClient.ApiResponse apiResponse) {
+                Map<String, Object> orderMap = (Map<String, Object>) apiResponse.getData();
+
+                GlobalCacheState.getOrders().update(transcriptOrder(orderMap));
+                GlobalCacheState.syncOrders();
+
+                onResponse.onSuccess(new ApiClient.ApiResponse(
+                    ApiClient.ResponseType.SUCCESS,
+                    null,
+                    null
+                ));
+            }
+
+            @Override
+            public void onError(ApiClient.ApiResponse apiResponse) {
+                onResponse.onError(apiResponse);
+            }
+        },
+            false).execute();
     }
 
     public void updateStatus(Order order,

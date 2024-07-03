@@ -40,7 +40,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="txtSearch" min="-2" pref="228" max="-2" attributes="0"/>
                           <EmptySpace pref="414" max="32767" attributes="0"/>
-                          <Component id="actionButton2" min="-2" pref="128" max="-2" attributes="0"/>
+                          <Component id="addProduct" min="-2" pref="128" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="actionButton3" min="-2" pref="128" max="-2" attributes="0"/>
                       </Group>
@@ -61,7 +61,7 @@
                       <Component id="txtSearch" min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="actionButton1" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
-                          <Component id="actionButton2" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
+                          <Component id="addProduct" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                           <Component id="actionButton3" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -180,12 +180,12 @@
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new ui.components.ActionButton(ActionButton.DESTRUCTIVE)"/>
           </AuxValues>
         </Component>
-        <Component class="ui.components.ActionButton" name="actionButton2">
+        <Component class="ui.components.ActionButton" name="addProduct">
           <Properties>
             <Property name="text" type="java.lang.String" value="Agregar"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="actionButton2ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addProductActionPerformed"/>
           </Events>
         </Component>
         <Component class="ui.components.ActionButton" name="actionButton3">

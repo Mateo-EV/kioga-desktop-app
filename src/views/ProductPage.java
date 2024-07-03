@@ -22,7 +22,7 @@ import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
 import utils.GlobalCacheState;
 import utils.structure.ArbolBinario;
-import views.dialog.CreateOrderForm;
+import views.dialog.CreateProductForm;
 
 public class ProductPage extends SimpleForm {
 
@@ -182,7 +182,7 @@ public class ProductPage extends SimpleForm {
         txtSearch = new javax.swing.JTextField();
         lbTitle = new javax.swing.JLabel();
         actionButton1 = new ui.components.ActionButton(ActionButton.DESTRUCTIVE);
-        actionButton2 = new ui.components.ActionButton();
+        addProduct = new ui.components.ActionButton();
         actionButton3 = new ui.components.ActionButton(ActionButton.SECONDARY);
 
         setLayout(null);
@@ -230,10 +230,10 @@ public class ProductPage extends SimpleForm {
 
         actionButton1.setText("Eliminar");
 
-        actionButton2.setText("Agregar");
-        actionButton2.addActionListener(new java.awt.event.ActionListener() {
+        addProduct.setText("Agregar");
+        addProduct.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                actionButton2ActionPerformed(evt);
+                addProductActionPerformed(evt);
             }
         });
 
@@ -254,7 +254,7 @@ public class ProductPage extends SimpleForm {
                     .addGroup(panelLayout.createSequentialGroup()
                         .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 414, Short.MAX_VALUE)
-                        .addComponent(actionButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(addProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(actionButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -271,7 +271,7 @@ public class ProductPage extends SimpleForm {
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(actionButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(actionButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(addProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(actionButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -284,8 +284,8 @@ public class ProductPage extends SimpleForm {
         panel.setBounds(0, 0, 1062, 663);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void actionButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionButton2ActionPerformed
-        CreateOrderForm dialog = new CreateOrderForm();
+    private void addProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addProductActionPerformed
+        CreateProductForm dialog = new CreateProductForm();
         DefaultOption option = new DefaultOption() {
             @Override
             public boolean closeWhenClickOutside() {
@@ -295,13 +295,13 @@ public class ProductPage extends SimpleForm {
         GlassPanePopup.showPopup(
             new SimplePopupBorder(
                 dialog,
-                "Crear Pedido"), option);
-    }//GEN-LAST:event_actionButton2ActionPerformed
+                "Crear Producto"), option);
+    }//GEN-LAST:event_addProductActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ui.components.ActionButton actionButton1;
-    private ui.components.ActionButton actionButton2;
     private ui.components.ActionButton actionButton3;
+    private ui.components.ActionButton addProduct;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lbTitle;
     private javax.swing.JPanel panel;

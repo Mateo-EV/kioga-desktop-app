@@ -9,6 +9,7 @@ import utils.structure.ArbolBinario;
 import views.OrderPage;
 import views.ProductPage;
 import views.dialog.CreateOrderForm;
+import views.dialog.EditOrderForm;
 
 public class GlobalCacheState {
 
@@ -44,11 +45,13 @@ public class GlobalCacheState {
 
     static public void syncProducts() {
         CreateOrderForm.syncProducts();
+        EditOrderForm.syncProducts();
         ProductPage.syncProducts();
     }
 
     static public void syncCustomers() {
-        CreateOrderForm.syncProducts();
+        CreateOrderForm.syncCustomers();
+        EditOrderForm.syncCustomers();
     }
 
     static public void syncCategories() {

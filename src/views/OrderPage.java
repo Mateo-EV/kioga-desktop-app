@@ -30,6 +30,7 @@ import utils.structure.ArbolBinario;
 import utils.structure.Cola;
 import views.dialog.CreateOrderForm;
 import views.dialog.DeleteOrderForm;
+import views.dialog.EditOrderForm;
 import views.dialog.ViewPendingOrderForm;
 
 public class OrderPage extends SimpleForm {
@@ -272,6 +273,11 @@ public class OrderPage extends SimpleForm {
         });
 
         actionButton3.setText("Editar");
+        actionButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionButton3ActionPerformed(evt);
+            }
+        });
 
         btnPending.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -383,6 +389,26 @@ public class OrderPage extends SimpleForm {
             }
         });
     }//GEN-LAST:event_btnPendingActionPerformed
+
+    private void actionButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionButton3ActionPerformed
+        List<Order> list = getSelectedData();
+        if (list.isEmpty() || list.size() > 1) {
+            Notifications.getInstance().show(Notifications.Type.WARNING,
+                "Selecciona 1 elemento para editar");
+            return;
+        }
+
+        EditOrderForm dialog = new EditOrderForm(list.get(0).getId());
+        GlassPanePopup.showPopup(
+            new SimplePopupBorder(
+                dialog,
+                "Editar Pedido"), new DefaultOption() {
+            @Override
+            public boolean closeWhenClickOutside() {
+                return true;
+            }
+        });
+    }//GEN-LAST:event_actionButton3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ui.components.ActionButton actionButton1;

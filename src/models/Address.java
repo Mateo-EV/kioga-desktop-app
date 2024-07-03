@@ -8,7 +8,7 @@ package models;
  *
  * @author intel
  */
-public class Address {
+public class Address implements Identifiable {
 
     private int id;
     private Customer user;
@@ -62,6 +62,7 @@ public class Address {
         }
     }
 
+    @Override
     public int getId() {
         return id;
     }
