@@ -8,8 +8,12 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
+import javax.swing.RowFilter;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import models.Category;
 import net.miginfocom.swing.MigLayout;
 import org.jdesktop.animation.timing.Animator;
@@ -35,6 +39,7 @@ import views.dialog.EditCategoryForm;
 public class CategoryPage extends SimpleForm {
 
     private final LoadingSkeleton loadingSkeleton;
+    private TableRowSorter rowSorter;
 
     public CategoryPage() {
         initComponents();
@@ -67,6 +72,35 @@ public class CategoryPage extends SimpleForm {
             FlatClientProperties.STYLE,
             "arc:25"
         );
+
+        rowSorter = new TableRowSorter(table.getModel());
+        table.setRowSorter(rowSorter);
+
+        txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                applyFilter();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                applyFilter();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                applyFilter();
+            }
+
+            private void applyFilter() {
+                String text = txtSearch.getText();
+                if (text.trim().length() == 0) {
+                    rowSorter.setRowFilter(null);
+                } else {
+                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                }
+            }
+        });
 
         table.getTableHeader().putClientProperty(
             FlatClientProperties.STYLE,
