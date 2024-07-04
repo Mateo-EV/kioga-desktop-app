@@ -18,7 +18,7 @@ import okhttp3.Response;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://localhost:8000";
+    private static final String BASE_URL = "https://api.kioga.lat";
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
     private static final MediaType JSON = MediaType.parse(
