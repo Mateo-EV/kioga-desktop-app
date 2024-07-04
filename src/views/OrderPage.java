@@ -82,7 +82,7 @@ public class OrderPage extends SimpleForm {
 
         table.putClientProperty(
             FlatClientProperties.STYLE,
-            "rowHeight:30;"
+            "rowHeight:70;"
             + "showHorizontalLines:true;"
             + "intercellSpacing:0,1;"
             + "cellFocusColor:$TableHeader.hoverBackground"

@@ -16,7 +16,9 @@ import models.Order;
 import models.OrderProduct;
 import models.OrderStatus;
 import net.miginfocom.swing.MigLayout;
+import raven.popup.DefaultOption;
 import raven.popup.GlassPanePopup;
+import raven.popup.component.SimplePopupBorder;
 import raven.toast.Notifications;
 import ui.components.ActionButton;
 import ui.components.LoadingButton;
@@ -149,36 +151,6 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
                     saveBtn.setText("Poner en espera");
                 }
 
-                txtFirstName.setText(order.getAddress().getFirstName());
-                txtFirstName.setEnabled(false);
-
-                txtLastName.setText(order.getAddress().getLastName());
-                txtLastName.setEnabled(false);
-
-                txtDni.setText(order.getAddress().getDni());
-                txtDni.setEnabled(false);
-
-                txtPhone.setText(order.getAddress().getPhone());
-                txtPhone.setEnabled(false);
-
-                txtDepartment.setText(order.getAddress().getDepartment());
-                txtDepartment.setEnabled(false);
-
-                txtProvince.setText(order.getAddress().getProvince());
-                txtProvince.setEnabled(false);
-
-                txtDistrict.setText(order.getAddress().getDistrict());
-                txtDistrict.setEnabled(false);
-
-                txtZipCode.setText(order.getAddress().getZipCode());
-                txtZipCode.setEnabled(false);
-
-                txtStreetAddress.setText(order.getAddress().getStreetAddress());
-                txtStreetAddress.setEnabled(false);
-
-                txtReference.setText(order.getAddress().getReference());
-                txtReference.setEnabled(false);
-
                 txtNotes.setText(order.getNotes());
                 txtNotes.setEnabled(false);
 
@@ -209,36 +181,6 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
 
         txtCliente.setText("");
         txtCliente.setEnabled(true);
-
-        txtFirstName.setText("");
-        txtFirstName.setEnabled(true);
-
-        txtLastName.setText("");
-        txtLastName.setEnabled(true);
-
-        txtDni.setText("");
-        txtDni.setEnabled(true);
-
-        txtPhone.setText("");
-        txtPhone.setEnabled(true);
-
-        txtDepartment.setText("");
-        txtDepartment.setEnabled(true);
-
-        txtProvince.setText("");
-        txtProvince.setEnabled(true);
-
-        txtDistrict.setText("");
-        txtDistrict.setEnabled(true);
-
-        txtZipCode.setText("");
-        txtZipCode.setEnabled(true);
-
-        txtStreetAddress.setText("");
-        txtStreetAddress.setEnabled(true);
-
-        txtReference.setText("");
-        txtReference.setEnabled(true);
 
         txtNotes.setText("");
         txtNotes.setEnabled(true);
@@ -365,7 +307,6 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
         FooterPanel = new javax.swing.JPanel();
         rbIsDelivery = new javax.swing.JRadioButton();
         rbNotDelivery = new javax.swing.JRadioButton();
-        jLabel5 = new javax.swing.JLabel();
         detailPanel = new javax.swing.JPanel();
         scroll = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
@@ -378,29 +319,10 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
         txtTotal = new javax.swing.JFormattedTextField(currencyFormat);
         lbSubtotal1 = new javax.swing.JLabel();
         txtStatus = new javax.swing.JTextField();
-        txtFirstName = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        txtLastName = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        txtDni = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        txtPhone = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
-        txtDepartment = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
-        txtProvince = new javax.swing.JTextField();
-        txtDistrict = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        txtZipCode = new javax.swing.JTextField();
-        jLabel13 = new javax.swing.JLabel();
-        txtStreetAddress = new javax.swing.JTextField();
-        jLabel14 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        txtReference = new javax.swing.JTextArea();
         txtCliente = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         txtCodigo = new javax.swing.JTextField();
+        actionButton1 = new ui.components.ActionButton();
 
         setLayout(new java.awt.CardLayout());
 
@@ -420,8 +342,6 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
         btnGisDelivery.add(rbNotDelivery);
         rbNotDelivery.setText("Retiro en tienda");
         rbNotDelivery.setEnabled(false);
-
-        jLabel5.setText("Nombre");
 
         scroll.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
@@ -448,7 +368,9 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
         detailPanel.setLayout(detailPanelLayout);
         detailPanelLayout.setHorizontalGroup(
             detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(scroll)
+            .addGroup(detailPanelLayout.createSequentialGroup()
+                .addComponent(scroll, javax.swing.GroupLayout.PREFERRED_SIZE, 566, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         detailPanelLayout.setVerticalGroup(
             detailPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -484,53 +406,18 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
         txtStatus.setText("Pendiente");
         txtStatus.setEnabled(false);
 
-        txtFirstName.setEditable(false);
-
-        jLabel6.setText("Apellido");
-
-        txtLastName.setEditable(false);
-
-        jLabel7.setText("Dni");
-
-        txtDni.setEditable(false);
-
-        jLabel8.setText("Teléfono");
-
-        txtPhone.setEditable(false);
-
-        jLabel9.setText("Departamento");
-
-        txtDepartment.setEditable(false);
-
-        jLabel10.setText("Provincia");
-
-        txtProvince.setEditable(false);
-
-        txtDistrict.setEditable(false);
-
-        jLabel11.setText("Distrito");
-
-        jLabel12.setText("Código Postal");
-
-        txtZipCode.setEditable(false);
-
-        jLabel13.setText("Dirección");
-
-        txtStreetAddress.setEditable(false);
-
-        jLabel14.setText("Referencia");
-
-        txtReference.setEditable(false);
-        txtReference.setColumns(20);
-        txtReference.setLineWrap(true);
-        txtReference.setRows(3);
-        jScrollPane2.setViewportView(txtReference);
-
         txtCliente.setEditable(false);
 
         jLabel2.setText("Código");
 
         txtCodigo.setEditable(false);
+
+        actionButton1.setText("Ver Dirección");
+        actionButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout PanelContainerLayout = new javax.swing.GroupLayout(PanelContainer);
         PanelContainer.setLayout(PanelContainerLayout);
@@ -552,24 +439,18 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
                                 .addComponent(txtSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGroup(PanelContainerLayout.createSequentialGroup()
                                     .addComponent(txtTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 111, Short.MAX_VALUE)
                                     .addComponent(lbSubtotal1)
                                     .addGap(65, 65, 65)
                                     .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelContainerLayout.createSequentialGroup()
                             .addComponent(rbIsDelivery)
                             .addGap(18, 18, 18)
-                            .addComponent(rbNotDelivery))
+                            .addComponent(rbNotDelivery)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(actionButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(FooterPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(PanelContainerLayout.createSequentialGroup()
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(24, 24, 24)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtLastName, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelContainerLayout.createSequentialGroup()
                             .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
@@ -578,41 +459,7 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
                             .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(txtCliente)
                                 .addComponent(txtCodigo))))
-                    .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(detailPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelContainerLayout.createSequentialGroup()
-                            .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jScrollPane2))
-                        .addGroup(PanelContainerLayout.createSequentialGroup()
-                            .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtStreetAddress))
-                        .addGroup(PanelContainerLayout.createSequentialGroup()
-                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtDistrict, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtZipCode, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(PanelContainerLayout.createSequentialGroup()
-                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtDepartment, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(24, 24, 24)
-                                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtProvince, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(PanelContainerLayout.createSequentialGroup()
-                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(24, 24, 24)
-                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addComponent(detailPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(50, 50, 50))
         );
         PanelContainerLayout.setVerticalGroup(
@@ -626,42 +473,11 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
                 .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
+                .addGap(6, 6, 6)
                 .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rbIsDelivery)
-                    .addComponent(rbNotDelivery))
-                .addGap(7, 7, 7)
-                .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDepartment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtProvince, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDistrict, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtZipCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtStreetAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(rbNotDelivery)
+                    .addComponent(actionButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
                 .addComponent(detailPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(8, 8, 8)
@@ -690,26 +506,33 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
         add(PanelContainer, "form-loaded");
     }// </editor-fold>//GEN-END:initComponents
 
+    private void actionButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionButton1ActionPerformed
+        DefaultOption option = new DefaultOption() {
+            @Override
+            public boolean closeWhenClickOutside() {
+                return true;
+            }
+        };
+        CreateVolatilAddress dialog = new CreateVolatilAddress(
+            actualOrderToSave.getIsDelivery(),
+            actualOrderToSave.getAddress());
+        GlassPanePopup.showPopup(
+            new SimplePopupBorder(
+                dialog,
+                "Ver dirección"), option
+        );
+    }//GEN-LAST:event_actionButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel FooterPanel;
     private javax.swing.JPanel PanelContainer;
+    private ui.components.ActionButton actionButton1;
     private javax.swing.ButtonGroup btnGisDelivery;
     private javax.swing.JPanel detailPanel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lbEnvio;
     private javax.swing.JLabel lbSubtotal;
     private javax.swing.JLabel lbSubtotal1;
@@ -720,20 +543,10 @@ public class ViewPendingOrderForm extends javax.swing.JPanel {
     private javax.swing.JTable table;
     private javax.swing.JTextField txtCliente;
     private javax.swing.JTextField txtCodigo;
-    private javax.swing.JTextField txtDepartment;
-    private javax.swing.JTextField txtDistrict;
-    private javax.swing.JTextField txtDni;
     private javax.swing.JFormattedTextField txtEnvio;
-    private javax.swing.JTextField txtFirstName;
-    private javax.swing.JTextField txtLastName;
     private javax.swing.JTextArea txtNotes;
-    private javax.swing.JTextField txtPhone;
-    private javax.swing.JTextField txtProvince;
-    private javax.swing.JTextArea txtReference;
     private javax.swing.JTextField txtStatus;
-    private javax.swing.JTextField txtStreetAddress;
     private javax.swing.JFormattedTextField txtSubtotal;
     private javax.swing.JFormattedTextField txtTotal;
-    private javax.swing.JTextField txtZipCode;
     // End of variables declaration//GEN-END:variables
 }
