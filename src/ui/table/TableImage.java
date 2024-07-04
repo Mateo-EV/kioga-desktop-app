@@ -9,10 +9,10 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import utils.GlobalCacheState;
 
 /**
  *
@@ -20,16 +20,15 @@ import javax.swing.ImageIcon;
  */
 public class TableImage extends javax.swing.JPanel {
 
-    private static final Map<String, ImageIcon> imageCache = new HashMap<>();
-
     /**
      * Creates new form TableImage
      *
-     * @param imageUrl
+     * @param url
      */
     public TableImage(String url) {
         initComponents();
         pic.setText("loading");
+        Map<String, ImageIcon> imageCache = GlobalCacheState.getImages();
         if (imageCache.containsKey(url)) {
             pic.setIcon(imageCache.get(url));
         } else {
@@ -47,7 +46,8 @@ public class TableImage extends javax.swing.JPanel {
 //        ImageLoader.loadImage(imageUrl, pic);
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, int width,
+    static public BufferedImage resizeImage(BufferedImage originalImage,
+        int width,
         int height) {
         Image resizedImage = originalImage.getScaledInstance(width, height,
             Image.SCALE_SMOOTH);

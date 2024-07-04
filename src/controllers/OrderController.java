@@ -84,6 +84,7 @@ public class OrderController implements ModelController<Order> {
                 null,
                 order_cached
             ));
+            return;
         }
 
         new BackgroundSwingWorker(

@@ -1,15 +1,21 @@
 package views.dialog;
 
-import com.formdev.flatlaf.extras.FlatSVGIcon;
 import controllers.ProductController;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -18,6 +24,7 @@ import javax.swing.event.DocumentListener;
 import jnafilechooser.api.JnaFileChooser;
 import models.Brand;
 import models.Category;
+import models.Identifiable;
 import models.Product;
 import models.Subcategory;
 import net.miginfocom.swing.MigLayout;
@@ -26,15 +33,18 @@ import raven.toast.Notifications;
 import ui.components.ActionButton;
 import ui.components.LoadingButton;
 import ui.components.LoadingSkeleton;
+import ui.table.TableImage;
 import utils.ApiClient;
 import utils.ComboBoxLoader;
+import utils.GlobalCacheState;
+import utils.ServiceWorker;
 import utils.structure.ArbolBinario;
 
 /**
  *
  * @author intel
  */
-public class CreateProductForm extends javax.swing.JPanel {
+public class EditProductForm extends javax.swing.JPanel {
 
     private final DefaultComboBoxModel<Category> categoriesModel = new DefaultComboBoxModel();
     private final DefaultComboBoxModel<Brand> brandsModel = new DefaultComboBoxModel();
@@ -44,6 +54,7 @@ public class CreateProductForm extends javax.swing.JPanel {
     private final DefaultComboBoxModel<Subcategory> subcategoriesModel = new DefaultComboBoxModel();
 
     private final Product product = new Product();
+    private Product productLoaded = new Product();
 
     private final JPanel loadingPanel = new JPanel();
 
@@ -54,10 +65,21 @@ public class CreateProductForm extends javax.swing.JPanel {
         new LoadingSkeleton(),
         new LoadingSkeleton(),};
 
-    public CreateProductForm() {
+    public EditProductForm(int productId) {
         initComponents();
         initcbModels();
+        productLoaded.setId(productId);
         init();
+    }
+
+    public void selectItemById(JComboBox comboBox, int id) {
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            Identifiable item = (Identifiable) comboBox.getItemAt(i);
+            if (item.getId() == id) {
+                comboBox.setSelectedIndex(i);
+                break;
+            }
+        }
     }
 
     private void initcbModels() {
@@ -156,13 +178,28 @@ public class CreateProductForm extends javax.swing.JPanel {
         }
     }
 
+    private void loadImage() {
+        Map<String, ImageIcon> imageCache = GlobalCacheState.getImages();
+        if (imageCache.containsKey(productLoaded.getImage())) {
+            pic.setImage(imageCache.get(productLoaded.getImage()));
+        } else {
+            try {
+                URL imageUrl = new URL(productLoaded.getImage());
+                BufferedImage image = ImageIO.read(imageUrl);
+                ImageIcon icon = new ImageIcon(TableImage.resizeImage(image, 60,
+                    60));
+                imageCache.put(productLoaded.getImage(), icon);
+                pic.setImage(icon);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void init() {
 
         initLayoutForLoading();
         showLoadingState();
-
-        pic.setImage(new FlatSVGIcon("resources/icon/image.svg", 5f));
-        txtDiscount.setValue(0d);
 
         txtPrice.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -180,26 +217,73 @@ public class CreateProductForm extends javax.swing.JPanel {
                 updateDiscountedPrice();
             }
         });
-        ProductController.getInstance().getDataToSave(
-            new ApiClient.onResponse() {
-            @Override
-            public void onSuccess(ApiClient.ApiResponse apiResponse) {
-                Object responses[] = (Object[]) apiResponse.getData();
-                ArbolBinario<Category> categories = (ArbolBinario<Category>) responses[0];
-                ArbolBinario<Brand> brands = (ArbolBinario<Brand>) responses[1];
 
-                ComboBoxLoader.loadItems(categoriesModel, categories);
-                ComboBoxLoader.loadItems(brandsModel, brands);
+        ServiceWorker.execute(() -> {
+            CountDownLatch latch = new CountDownLatch(2);
+            ProductController.getInstance().getDataToSave(
+                new ApiClient.onResponse() {
+                @Override
+                public void onSuccess(ApiClient.ApiResponse apiResponse) {
+                    Object responses[] = (Object[]) apiResponse.getData();
+                    ArbolBinario<Category> categories = (ArbolBinario<Category>) responses[0];
+                    ArbolBinario<Brand> brands = (ArbolBinario<Brand>) responses[1];
+
+                    ComboBoxLoader.loadItems(categoriesModel, categories);
+                    ComboBoxLoader.loadItems(brandsModel, brands);
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(ApiClient.ApiResponse apiResponse) {
+                    GlassPanePopup.closePopupLast();
+                    latch.countDown();
+                    Notifications.getInstance().show(
+                        Notifications.Type.ERROR,
+                        apiResponse.getMessage()
+                    );
+                }
+            });
+
+            ProductController.getInstance().findById(productLoaded.getId(),
+                new ApiClient.onResponse() {
+                @Override
+                public void onSuccess(ApiClient.ApiResponse apiResponse) {
+                    productLoaded = (Product) apiResponse.getData();
+                    txtName.setText(productLoaded.getName());
+                    txtPrice.setText(String.valueOf(productLoaded.getPrice()));
+                    slDiscount.setValue(
+                        (int) (productLoaded.getDiscount() * 100));
+                    txtDiscount.setValue(productLoaded.getDiscount());
+                    txtPriceDiscounted.setValue(
+                        productLoaded.getPriceDiscounted());
+                    txtStock.setValue(productLoaded.getStock());
+                    txtDescription.setText(productLoaded.getDescription());
+
+                    loadImage();
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(ApiClient.ApiResponse apiResponse) {
+                    latch.countDown();
+                    GlassPanePopup.closePopupLast();
+                    Notifications.getInstance().show(
+                        Notifications.Type.ERROR,
+                        apiResponse.getMessage()
+                    );
+                }
+            });
+
+            try {
+                latch.await();
                 stopLoadingState();
-            }
-
-            @Override
-            public void onError(ApiClient.ApiResponse apiResponse) {
+                selectItemById(cbBrands, productLoaded.getBrand().getId());
+                selectItemById(cbCategories, productLoaded.getBrand().getId());
+            } catch (InterruptedException ex) {
                 GlassPanePopup.closePopupLast();
-                stopLoadingState();
                 Notifications.getInstance().show(
                     Notifications.Type.ERROR,
-                    apiResponse.getMessage()
+                    "Algo malo ocurrió"
                 );
             }
         });
@@ -236,18 +320,22 @@ public class CreateProductForm extends javax.swing.JPanel {
             }
 
             saveBtn.startLoading();
+            product.setId(productLoaded.getId());
             product.setName(txtName.getText());
             product.setBrand((Brand) brandsModel.getSelectedItem());
             product.setCategory((Category) categoriesModel.getSelectedItem());
             product.setDescription(txtDescription.getText());
             product.setStock(stock);
-            product.setSubcategory(
-                (Subcategory) subcategoriesModel.getSelectedItem());
+            if (subcategoriesModel.getSelectedItem() != null) {
+                product.setSubcategory(
+                    (Subcategory) subcategoriesModel.getSelectedItem());
+            }
+
             product.setIsActive(checkBoxIsActive.isSelected());
             product.setPrice(price);
             product.setDiscount(((double) slDiscount.getValue()) / 100);
 
-            ProductController.getInstance().save(product,
+            ProductController.getInstance().update(product,
                 new ApiClient.onResponse() {
                 @Override
                 public void onSuccess(ApiClient.ApiResponse apiResponse) {
@@ -535,6 +623,10 @@ public class CreateProductForm extends javax.swing.JPanel {
             }
             lbSubcategory.setVisible(true);
             cbSubcategories.setVisible(true);
+
+            if (productLoaded.getSubcategory() != null) {
+                selectItemById(cbSubcategories, product.getSubcategory().getId());
+            }
         }
     }//GEN-LAST:event_cbCategoriesActionPerformed
 
@@ -550,7 +642,7 @@ public class CreateProductForm extends javax.swing.JPanel {
     }//GEN-LAST:event_btnAddImageActionPerformed
 
     private void btnDeleteImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteImageActionPerformed
-        pic.setImage(new FlatSVGIcon("resources/icon/image.svg", 5f));
+        loadImage();
         product.setImageFile(null);
     }//GEN-LAST:event_btnDeleteImageActionPerformed
 

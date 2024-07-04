@@ -1,6 +1,5 @@
 package controllers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,6 @@ import utils.structure.ArbolBinario;
 
 public class ProductController implements ModelController<Product> {
 
-    static public List<Product> products = new ArrayList();
     private static final ProductController instance = new ProductController();
 
     static public Product transcriptProduct(Map<String, Object> productMap) {
@@ -49,13 +47,13 @@ public class ProductController implements ModelController<Product> {
         Product productCached = GlobalCacheState.getProducts().find(id);
         if (productCached != null
             && productCached.getCategory() != null
-            && productCached.getBrand() != null
-            && productCached.getSubcategory() != null) {
+            && productCached.getBrand() != null) {
             onResponse.onSuccess(new ApiClient.ApiResponse(
                 ApiClient.ResponseType.SUCCESS,
                 null,
                 productCached
             ));
+            return;
         }
 
         new BackgroundSwingWorker(
@@ -76,10 +74,13 @@ public class ProductController implements ModelController<Product> {
                     (Map<String, Object>) productMap.get("category")
                 );
 
-                Subcategory subcategory = CategoryController.transcriptSubcategory(
-                    (Map<String, Object>) productMap.get("subcategory"),
-                    category
-                );
+                Subcategory subcategory = null;
+                if (productMap.get("subcategory") != null) {
+                    subcategory = CategoryController.transcriptSubcategory(
+                        (Map<String, Object>) productMap.get("subcategory"),
+                        category
+                    );
+                }
 
                 product.setCategory(category);
                 product.setBrand(brand);
@@ -211,11 +212,12 @@ public class ProductController implements ModelController<Product> {
         productMap.put("discount", product.getDiscount());
         productMap.put("stock", product.getStock());
         productMap.put("category_id", product.getCategory().getId());
-        productMap.put("subcategory_id", product.getSubcategory().getId());
+        if (product.getSubcategory() != null) {
+            productMap.put("subcategory_id", product.getSubcategory().getId());
+        }
         productMap.put("is_active", product.getIsActive());
         productMap.put("image", product.getImageFile());
         productMap.put("brand_id", product.getBrand().getId());
-
         new BackgroundSwingWorker("/admin/products", "POST", productMap,
             new ApiClient.onResponse() {
             @Override
@@ -249,20 +251,30 @@ public class ProductController implements ModelController<Product> {
         productMap.put("discount", product.getDiscount());
         productMap.put("stock", product.getStock());
         productMap.put("category_id", product.getCategory().getId());
-        productMap.put("subcategory_id", product.getSubcategory().getId());
+        if (product.getSubcategory() != null) {
+            productMap.put("subcategory_id", product.getSubcategory().getId());
+        }
         productMap.put("is_active", product.getIsActive());
-        productMap.put("image", product.getImageFile());
+        if (product.getImageFile() != null) {
+            productMap.put("image", product.getImageFile());
+        }
         productMap.put("brand_id", product.getBrand().getId());
-
-        new BackgroundSwingWorker("/admin/products/" + product.getId(), "PUT",
+        System.out.println(productMap);
+        new BackgroundSwingWorker("/admin/products/update/" + product.getId(),
+            "POST",
             productMap,
             new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 Map<String, Object> productMap = (Map<String, Object>) apiResponse.getData();
-
-                GlobalCacheState.getProducts().update(transcriptProduct(
-                    productMap));
+                System.out.println(productMap);
+                Product productUpdated = transcriptProduct(
+                    productMap);
+                GlobalCacheState.getProducts().update(productUpdated);
+                if (GlobalCacheState.getImages().get(productUpdated.getImage()) != null) {
+                    GlobalCacheState.getImages().remove(
+                        productUpdated.getImage());
+                }
                 GlobalCacheState.syncProducts();
 
                 onResponse.onSuccess(new ApiClient.ApiResponse(

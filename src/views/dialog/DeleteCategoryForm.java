@@ -4,11 +4,11 @@
  */
 package views.dialog;
 
-import controllers.OrderController;
+import controllers.CategoryController;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import models.Order;
+import models.Category;
 import raven.popup.GlassPanePopup;
 import raven.toast.Notifications;
 import ui.components.ActionButton;
@@ -20,13 +20,13 @@ import utils.ServiceWorker;
  *
  * @author intel
  */
-public class DeleteOrderForm extends javax.swing.JPanel {
+public class DeleteCategoryForm extends javax.swing.JPanel {
 
-    private final List<Order> ordersToDelete;
+    private final List<Category> categoriesToDel;
 
-    public DeleteOrderForm(List<Order> ordersToDelete) {
+    public DeleteCategoryForm(List<Category> categoriesToDel) {
         initComponents();
-        this.ordersToDelete = ordersToDelete;
+        this.categoriesToDel = categoriesToDel;
         init();
     }
 
@@ -44,15 +44,16 @@ public class DeleteOrderForm extends javax.swing.JPanel {
         deleteBtn.addActionListener((e) -> {
             deleteBtn.startLoading();
             ServiceWorker.execute(() -> {
-                CountDownLatch latch = new CountDownLatch(ordersToDelete.size());
-                for (Order order : ordersToDelete) {
-                    OrderController.getInstance().delete(order.getId(),
+                CountDownLatch latch = new CountDownLatch(
+                    categoriesToDel.size());
+                for (Category category : categoriesToDel) {
+                    CategoryController.getInstance().delete(category.getId(),
                         new ApiClient.onResponse() {
                         @Override
                         public void onSuccess(ApiClient.ApiResponse apiResponse) {
                             Notifications.getInstance().show(
                                 Notifications.Type.SUCCESS,
-                                "Pedido eliminado correctamente");
+                                "Categoría eliminada correctamente");
                             latch.countDown();
                         }
 
@@ -60,7 +61,7 @@ public class DeleteOrderForm extends javax.swing.JPanel {
                         public void onError(ApiClient.ApiResponse apiResponse) {
                             Notifications.getInstance().show(
                                 Notifications.Type.ERROR,
-                                "Error al eliminar el pedido");
+                                "Error al eliminar la categoría");
                             latch.countDown();
                         }
                     });

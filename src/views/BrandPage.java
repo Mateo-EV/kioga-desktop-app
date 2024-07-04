@@ -2,7 +2,7 @@ package views;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
-import controllers.ProductController;
+import controllers.BrandController;
 import java.awt.Color;
 import java.awt.Component;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import models.Product;
+import models.Brand;
 import net.miginfocom.swing.MigLayout;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
@@ -28,15 +28,15 @@ import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
 import utils.GlobalCacheState;
 import utils.structure.ArbolBinario;
-import views.dialog.CreateProductForm;
-import views.dialog.DeleteProductForm;
-import views.dialog.EditProductForm;
+import views.dialog.CreateBrandForm;
+import views.dialog.DeleteBrandForm;
+import views.dialog.EditBrandForm;
 
-public class ProductPage extends SimpleForm {
+public class BrandPage extends SimpleForm {
 
     private final LoadingSkeleton loadingSkeleton;
 
-    public ProductPage() {
+    public BrandPage() {
         initComponents();
         setLayout(new MigLayout("wrap,fill,insets 10", "fill", "fill"));
         loadingSkeleton = new LoadingSkeleton();
@@ -59,7 +59,7 @@ public class ProductPage extends SimpleForm {
         );
 
         txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
-            "Buscar productos");
+            "Buscar marcas");
         txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON,
             new FlatSVGIcon("resources/icon/search.svg"));
 
@@ -96,7 +96,7 @@ public class ProductPage extends SimpleForm {
         table.getColumnModel().getColumn(3).setCellRenderer(
             new ImageTableRenderer(table));
 
-        table.getColumnModel().getColumn(9).setCellRenderer(
+        table.getColumnModel().getColumn(6).setCellRenderer(
             new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table,
@@ -109,27 +109,24 @@ public class ProductPage extends SimpleForm {
         loadData();
     }
 
-    public static void syncProducts() {
+    public static void syncBrands() {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         tableModel.setRowCount(0);
-        GlobalCacheState.getProducts().forEach(product -> {
-            addProductToTable(product);
+        GlobalCacheState.getBrands().forEach(a -> {
+            addProductToTable(a);
         });
     }
 
-    private static void addProductToTable(Product product) {
+    private static void addProductToTable(Brand brand) {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
         tableModel.addRow(new Object[]{
             false,
-            product.getId(),
-            product.getName(),
-            product.getImage(),
-            product.getPriceDiscountedFormatted(),
-            product.getStock(),
-            product.getDescription(),
-            product.getCreatedAtDate(),
-            product.getUpdatedAtDate(),
-            product
+            brand.getId(),
+            brand.getName(),
+            brand.getImage(),
+            brand.getCreatedAtDate(),
+            brand.getUpdatedAtDate(),
+            brand
         });
     }
 
@@ -165,12 +162,12 @@ public class ProductPage extends SimpleForm {
 
     private void loadData() {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-        ProductController.getInstance().findAll(new ApiClient.onResponse() {
+        BrandController.getInstance().findAll(new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse response) {
-                ArbolBinario<Product> products = (ArbolBinario<Product>) response.getData();
+                ArbolBinario<Brand> brands = (ArbolBinario<Brand>) response.getData();
                 tableModel.setRowCount(0);
-                products.forEach((product) -> addProductToTable(product));
+                brands.forEach((b) -> addProductToTable(b));
                 showTable();
                 loadingSkeleton.stopLoading();
             }
@@ -187,11 +184,11 @@ public class ProductPage extends SimpleForm {
         });
     }
 
-    private List<Product> getSelectedData() {
-        List<Product> list = new ArrayList();
+    private List<Brand> getSelectedData() {
+        List<Brand> list = new ArrayList();
         for (int i = 0; i < table.getRowCount(); i++) {
             if ((boolean) table.getValueAt(i, 0)) {
-                list.add((Product) table.getValueAt(i, 9));
+                list.add((Brand) table.getValueAt(i, 6));
             }
         }
         return list;
@@ -224,14 +221,14 @@ public class ProductPage extends SimpleForm {
 
             },
             new String [] {
-                "SELECT", "#", "NOMBRE", "IMAGEN", "PRECIO", "STOCK", "DESCRIPCIÖN", "CREADO", "ACTUALIZADO", ""
+                "SELECT", "#", "NOMBRE", "IMAGEN", "CREADO", "ACTUALIZADO", ""
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Boolean.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Boolean.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                true, false, false, false, false, false, false, false, true, false
+                true, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -250,15 +247,12 @@ public class ProductPage extends SimpleForm {
             table.getColumnModel().getColumn(2).setPreferredWidth(150);
             table.getColumnModel().getColumn(3).setPreferredWidth(100);
             table.getColumnModel().getColumn(4).setPreferredWidth(150);
-            table.getColumnModel().getColumn(5).setPreferredWidth(50);
-            table.getColumnModel().getColumn(6).setPreferredWidth(150);
-            table.getColumnModel().getColumn(7).setPreferredWidth(150);
-            table.getColumnModel().getColumn(8).setPreferredWidth(150);
-            table.getColumnModel().getColumn(9).setPreferredWidth(0);
-            table.getColumnModel().getColumn(9).setMaxWidth(0);
+            table.getColumnModel().getColumn(5).setPreferredWidth(150);
+            table.getColumnModel().getColumn(6).setPreferredWidth(0);
+            table.getColumnModel().getColumn(6).setMaxWidth(0);
         }
 
-        lbTitle.setText("Productos");
+        lbTitle.setText("Marcas");
 
         btnDelete.setText("Eliminar");
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -327,7 +321,7 @@ public class ProductPage extends SimpleForm {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        CreateProductForm dialog = new CreateProductForm();
+        CreateBrandForm dialog = new CreateBrandForm();
         DefaultOption option = new DefaultOption() {
             @Override
             public boolean closeWhenClickOutside() {
@@ -337,18 +331,18 @@ public class ProductPage extends SimpleForm {
         GlassPanePopup.showPopup(
             new SimplePopupBorder(
                 dialog,
-                "Crear Producto"), option);
+                "Crear Marca"), option);
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        List<Product> list = getSelectedData();
+        List<Brand> list = getSelectedData();
         if (list.isEmpty()) {
             Notifications.getInstance().show(Notifications.Type.WARNING,
                 "Selecciona al menos un elemento para borrar");
             return;
         }
 
-        DeleteProductForm dialog = new DeleteProductForm(list);
+        DeleteBrandForm dialog = new DeleteBrandForm(list);
         DefaultOption option = new DefaultOption() {
             @Override
             public boolean closeWhenClickOutside() {
@@ -362,18 +356,18 @@ public class ProductPage extends SimpleForm {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        List<Product> list = getSelectedData();
+        List<Brand> list = getSelectedData();
         if (list.isEmpty() || list.size() > 1) {
             Notifications.getInstance().show(Notifications.Type.WARNING,
                 "Selecciona 1 elemento para editar");
             return;
         }
 
-        EditProductForm dialog = new EditProductForm(list.get(0).getId());
+        EditBrandForm dialog = new EditBrandForm(list.get(0).getId());
         GlassPanePopup.showPopup(
             new SimplePopupBorder(
                 dialog,
-                "Editar Producto"), new DefaultOption() {
+                "Editar Marca"), new DefaultOption() {
             @Override
             public boolean closeWhenClickOutside() {
                 return true;

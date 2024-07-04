@@ -42,7 +42,6 @@ import ui.table.ImageTableRenderer;
 import ui.table.TableHeaderAlignment;
 import utils.ApiClient;
 import utils.ComboBoxLoader;
-import utils.GlobalCacheState;
 import utils.ServiceWorker;
 import utils.structure.ArbolBinario;
 
@@ -52,8 +51,8 @@ import utils.structure.ArbolBinario;
  */
 public class EditOrderForm extends javax.swing.JPanel {
 
-    private static final DefaultComboBoxModel<Customer> customersModel = new DefaultComboBoxModel();
-    private static final DefaultComboBoxModel<Product> productsModel = new DefaultComboBoxModel();
+    private final DefaultComboBoxModel<Customer> customersModel = new DefaultComboBoxModel();
+    private final DefaultComboBoxModel<Product> productsModel = new DefaultComboBoxModel();
     static private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(
         new Locale("es", "PE"));
 
@@ -77,20 +76,6 @@ public class EditOrderForm extends javax.swing.JPanel {
         initcbModels();
         initTableModel();
         init(orderId);
-    }
-
-    static public void syncCustomers() {
-        customersModel.removeAllElements();
-        GlobalCacheState.getCustomers().forEach(customer -> {
-            customersModel.addElement(customer);
-        });
-    }
-
-    static public void syncProducts() {
-        productsModel.removeAllElements();
-        GlobalCacheState.getProducts().forEach(product -> {
-            productsModel.addElement(product);
-        });
     }
 
     private void initcbModels() {

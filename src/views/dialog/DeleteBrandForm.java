@@ -4,11 +4,11 @@
  */
 package views.dialog;
 
-import controllers.OrderController;
+import controllers.BrandController;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import models.Order;
+import models.Brand;
 import raven.popup.GlassPanePopup;
 import raven.toast.Notifications;
 import ui.components.ActionButton;
@@ -20,13 +20,13 @@ import utils.ServiceWorker;
  *
  * @author intel
  */
-public class DeleteOrderForm extends javax.swing.JPanel {
+public class DeleteBrandForm extends javax.swing.JPanel {
 
-    private final List<Order> ordersToDelete;
+    private final List<Brand> brandsToDelete;
 
-    public DeleteOrderForm(List<Order> ordersToDelete) {
+    public DeleteBrandForm(List<Brand> brandsToDelete) {
         initComponents();
-        this.ordersToDelete = ordersToDelete;
+        this.brandsToDelete = brandsToDelete;
         init();
     }
 
@@ -44,15 +44,16 @@ public class DeleteOrderForm extends javax.swing.JPanel {
         deleteBtn.addActionListener((e) -> {
             deleteBtn.startLoading();
             ServiceWorker.execute(() -> {
-                CountDownLatch latch = new CountDownLatch(ordersToDelete.size());
-                for (Order order : ordersToDelete) {
-                    OrderController.getInstance().delete(order.getId(),
+                CountDownLatch latch = new CountDownLatch(
+                    brandsToDelete.size());
+                for (Brand brand : brandsToDelete) {
+                    BrandController.getInstance().delete(brand.getId(),
                         new ApiClient.onResponse() {
                         @Override
                         public void onSuccess(ApiClient.ApiResponse apiResponse) {
                             Notifications.getInstance().show(
                                 Notifications.Type.SUCCESS,
-                                "Pedido eliminado correctamente");
+                                "Marca eliminada correctamente");
                             latch.countDown();
                         }
 
@@ -60,7 +61,7 @@ public class DeleteOrderForm extends javax.swing.JPanel {
                         public void onError(ApiClient.ApiResponse apiResponse) {
                             Notifications.getInstance().show(
                                 Notifications.Type.ERROR,
-                                "Error al eliminar el pedido");
+                                "Error al eliminar la marca");
                             latch.countDown();
                         }
                     });

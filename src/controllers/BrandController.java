@@ -11,6 +11,12 @@ import utils.structure.ArbolBinario;
 
 public class BrandController implements ModelController<Brand> {
 
+    private static final BrandController instance = new BrandController();
+
+    public static BrandController getInstance() {
+        return instance;
+    }
+
     static public Brand transcriptBrand(Map<String, Object> brandMap) {
         Brand brand = new Brand(
             ((Number) brandMap.get("id")).intValue(),
@@ -35,6 +41,7 @@ public class BrandController implements ModelController<Brand> {
                 null,
                 brandCached
             ));
+            return;
         }
 
         new BackgroundSwingWorker(
@@ -67,11 +74,11 @@ public class BrandController implements ModelController<Brand> {
 
     @Override
     public void findAll(ApiClient.onResponse onResponse) {
-        if (!GlobalCacheState.getCategories().isEmpty()) {
+        if (!GlobalCacheState.getBrands().isEmpty()) {
             onResponse.onSuccess(new ApiClient.ApiResponse(
                 ApiClient.ResponseType.SUCCESS,
                 null,
-                GlobalCacheState.getCategories()
+                GlobalCacheState.getBrands()
             ));
             return;
         }
@@ -138,16 +145,20 @@ public class BrandController implements ModelController<Brand> {
     public void update(Brand brand, ApiClient.onResponse onResponse) {
         Map<String, Object> brandMap = new HashMap<>();
         brandMap.put("name", brand.getName());
-        brandMap.put("image", brand.getImageFile());
 
-        new BackgroundSwingWorker("/admin/brands/" + brand.getId(), "PUT",
+        if (brand.getImageFile() != null) {
+            brandMap.put("image", brand.getImageFile());
+        }
+
+        new BackgroundSwingWorker("/admin/brands/update/" + brand.getId(),
+            "POST",
             brandMap,
             new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 Map<String, Object> brandMap = (Map<String, Object>) apiResponse.getData();
 
-                GlobalCacheState.getBrands().insert(transcriptBrand(
+                GlobalCacheState.getBrands().update(transcriptBrand(
                     brandMap));
                 GlobalCacheState.syncBrands();
 

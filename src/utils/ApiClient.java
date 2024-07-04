@@ -58,6 +58,7 @@ public class ApiClient {
             if (!response.isSuccessful()) {
                 Map<String, Object> errorFormatted = gson.fromJson(bodyString,
                     type);
+                System.out.println(errorFormatted);
                 throw new ApiException(response.code(),
                     (String) errorFormatted.get("message"));
             }
@@ -104,6 +105,9 @@ public class ApiClient {
                     builder.addFormDataPart(entry.getKey(), file.getName(),
                         RequestBody.create(file, MediaType.parse(
                             "application/octet-stream")));
+                } else if (entry.getValue() instanceof Boolean) {
+                    builder.addFormDataPart(entry.getKey(),
+                        (Boolean) entry.getValue() ? "1" : "0");
                 } else {
                     builder.addFormDataPart(entry.getKey(),
                         entry.getValue().toString());

@@ -1,15 +1,19 @@
 package utils;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.ImageIcon;
 import models.Brand;
 import models.Category;
 import models.Customer;
 import models.Order;
 import models.Product;
 import utils.structure.ArbolBinario;
+import views.BrandPage;
+import views.CategoryPage;
 import views.OrderPage;
 import views.ProductPage;
 import views.dialog.CreateOrderForm;
-import views.dialog.EditOrderForm;
 
 public class GlobalCacheState {
 
@@ -18,6 +22,8 @@ public class GlobalCacheState {
     final static protected ArbolBinario<Product> products = new ArbolBinario();
     final static protected ArbolBinario<Category> categories = new ArbolBinario();
     final static protected ArbolBinario<Brand> brands = new ArbolBinario();
+
+    final static protected Map<String, ImageIcon> images = new HashMap<>();
 
     public static ArbolBinario<Order> getOrders() {
         return orders;
@@ -39,26 +45,28 @@ public class GlobalCacheState {
         return brands;
     }
 
+    public static Map<String, ImageIcon> getImages() {
+        return images;
+    }
+
     static public void syncOrders() {
         OrderPage.syncOrders();
     }
 
     static public void syncProducts() {
         CreateOrderForm.syncProducts();
-        EditOrderForm.syncProducts();
         ProductPage.syncProducts();
     }
 
     static public void syncCustomers() {
         CreateOrderForm.syncCustomers();
-        EditOrderForm.syncCustomers();
     }
 
     static public void syncCategories() {
-
+        CategoryPage.syncCategories();
     }
 
     static public void syncBrands() {
-
+        BrandPage.syncBrands();
     }
 }

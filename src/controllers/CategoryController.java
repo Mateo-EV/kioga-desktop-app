@@ -20,6 +20,12 @@ import utils.structure.ArbolBinario;
  */
 public class CategoryController implements ModelController<Category> {
 
+    private static final CategoryController instance = new CategoryController();
+
+    public static CategoryController getInstance() {
+        return instance;
+    }
+
     static public Category transcriptCategory(Map<String, Object> categoryMap) {
         Category category = new Category(
             ((Number) categoryMap.get("id")).intValue(),
@@ -36,16 +42,16 @@ public class CategoryController implements ModelController<Category> {
     }
 
     static public Subcategory transcriptSubcategory(
-        Map<String, Object> customerMap, Category category) {
+        Map<String, Object> subcategoryMap, Category category) {
         Subcategory customer = new Subcategory(
-            ((Number) customerMap.get("id")).intValue(),
-            (String) customerMap.get("name"),
-            (String) customerMap.get("slug"),
+            ((Number) subcategoryMap.get("id")).intValue(),
+            (String) subcategoryMap.get("name"),
+            (String) subcategoryMap.get("slug"),
             category
         );
-        customer.setCreatedAtFromTimeStamp((String) customerMap.get(
+        customer.setCreatedAtFromTimeStamp((String) subcategoryMap.get(
             "created_at"));
-        customer.setUpdatedAtFromTimeStamp((String) customerMap.get(
+        customer.setUpdatedAtFromTimeStamp((String) subcategoryMap.get(
             "updated_at"));
 
         return customer;
@@ -60,6 +66,7 @@ public class CategoryController implements ModelController<Category> {
                 null,
                 categoryCached
             ));
+            return;
         }
 
         new BackgroundSwingWorker(
@@ -180,16 +187,19 @@ public class CategoryController implements ModelController<Category> {
     public void update(Category category, ApiClient.onResponse onResponse) {
         Map<String, Object> categoryMap = new HashMap<>();
         categoryMap.put("name", category.getName());
-        categoryMap.put("image", category.getImageFile());
+        if (category.getImageFile() != null) {
+            categoryMap.put("image", category.getImageFile());
+        }
 
-        new BackgroundSwingWorker("/admin/categories/" + category.getId(), "PUT",
+        new BackgroundSwingWorker("/admin/categories/update/" + category.getId(),
+            "POST",
             categoryMap,
             new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 Map<String, Object> categoryMap = (Map<String, Object>) apiResponse.getData();
 
-                GlobalCacheState.getCategories().insert(transcriptCategory(
+                GlobalCacheState.getCategories().update(transcriptCategory(
                     categoryMap));
                 GlobalCacheState.syncCategories();
 
