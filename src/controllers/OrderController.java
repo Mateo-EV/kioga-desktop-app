@@ -395,7 +395,7 @@ public class OrderController implements ModelController<Order> {
     public Cola<Order> getOrdersToDelivery() {
 
         Cola<Order> orders = new Cola();
-        GlobalCacheState.getOrders().forEach((order) -> {
+        GlobalCacheState.getOrders().forEachReverse((order) -> {
             if (order.getStatus() == OrderStatus.PENDING) {
                 orders.enqueue(order);
             }

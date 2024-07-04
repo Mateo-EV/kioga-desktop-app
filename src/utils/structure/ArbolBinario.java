@@ -135,4 +135,16 @@ public class ArbolBinario<T extends Identifiable> {
             forEachRec(node.right, action);
         }
     }
+
+    public void forEachReverse(Consumer<T> action) {
+        forEachReverseRec(root, action);
+    }
+
+    private void forEachReverseRec(ArbolNodo<T> node, Consumer<T> action) {
+        if (node != null) {
+            forEachReverseRec(node.right, action);
+            action.accept(node.data);
+            forEachReverseRec(node.left, action);
+        }
+    }
 }
