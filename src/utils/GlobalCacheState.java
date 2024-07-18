@@ -10,6 +10,7 @@ import models.Customer;
 import models.Order;
 import models.Product;
 import utils.structure.ArbolBinario;
+import views.AdminPage;
 import views.BrandPage;
 import views.CategoryPage;
 import views.CustomerPage;
@@ -79,6 +80,6 @@ public class GlobalCacheState {
     }
 
     static public void syncAdmins() {
-
+        AdminPage.syncAdmins();
     }
 }

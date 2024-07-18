@@ -52,7 +52,9 @@ public class AdminPage extends SimpleForm {
     @Override
     public void formRefresh() {
         showLoadingSkeleton();
+        table.setRowSorter(null);
         loadData();
+        table.setRowSorter(rowSorter);
     }
 
     private void init() {
@@ -65,7 +67,7 @@ public class AdminPage extends SimpleForm {
         );
 
         txtSearch.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
-            "Buscar clientes");
+            "Buscar administradores");
         txtSearch.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON,
             new FlatSVGIcon("resources/icon/search.svg"));
 
@@ -302,7 +304,7 @@ public class AdminPage extends SimpleForm {
             table.getColumnModel().getColumn(6).setMaxWidth(0);
         }
 
-        lbTitle.setText("Clientes");
+        lbTitle.setText("Administradores");
 
         btnDelete.setText("Eliminar");
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
@@ -367,7 +369,7 @@ public class AdminPage extends SimpleForm {
         );
 
         add(panel);
-        panel.setBounds(0, 0, 0, 0);
+        panel.setBounds(0, 0, 1062, 663);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed

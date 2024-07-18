@@ -157,7 +157,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="lbTitle">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Clientes"/>
+            <Property name="text" type="java.lang.String" value="Administradores"/>
           </Properties>
         </Component>
         <Component class="ui.components.ActionButton" name="btnDelete">

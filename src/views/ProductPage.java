@@ -53,7 +53,9 @@ public class ProductPage extends SimpleForm {
     @Override
     public void formRefresh() {
         showLoadingSkeleton();
+        table.setRowSorter(null);
         loadData();
+        table.setRowSorter(rowSorter);
     }
 
     private void init() {

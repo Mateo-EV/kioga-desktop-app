@@ -35,9 +35,11 @@ public class LoadingSkeleton extends JPanel {
     }
 
     public void startLoading() {
-        animator.start();
-        revalidate();
-        repaint();
+        if (!animator.isRunning()) {
+            animator.start();
+            revalidate();
+            repaint();
+        }
     }
 
     public void stopLoading() {

@@ -55,7 +55,6 @@ public class FormManager {
             logout();
         } else {
             login(admin);
-            initPage.init();
         }
         showForm(initPage);
     }
