@@ -1,34 +1,31 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package models;
 
-/**
- *
- * @author intel
- */
-public class Admin {
+public class Admin extends TimeStamps implements Identifiable {
+
+    private int id;
     private String name;
     private String email;
-    private String image;
-    private final String base_image_url = "https://ui-avatars.com/api/?name=";
-    
-    public Admin(){};
+    private String password;
 
-    public Admin(String name, String email) {
+    private String image;
+    private final static String BASE_IMAGE_URL = "https://ui-avatars.com/api/?name=";
+
+    public Admin() {
+    }
+
+    public Admin(int id, String name, String email) {
         this.name = name;
         this.email = email;
-        this.image = base_image_url.concat(name);
+        this.image = BASE_IMAGE_URL.concat(name);
     }
-    
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-        this.image = base_image_url.concat(name);
+        this.image = BASE_IMAGE_URL.concat(name);
     }
 
     public String getEmail() {
@@ -40,7 +37,23 @@ public class Admin {
     }
 
     public String getImage() {
-        System.out.println(image);
         return image;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

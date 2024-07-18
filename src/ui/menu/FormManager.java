@@ -8,16 +8,18 @@ import javax.swing.SwingUtilities;
 import models.Admin;
 import ui.components.MainForm;
 import ui.components.SimpleForm;
-import views.LoginPage;
 import ui.swing.slider.PanelSlider;
 import ui.swing.slider.SimpleTransition;
 import utils.UndoRedo;
 import views.DashboardPage;
+import views.LoginPage;
 
 public class FormManager {
 
     private static FormManager instance;
     private final JFrame frame;
+
+    private static final DashboardPage initPage = new DashboardPage(false);
 
     private final UndoRedo<SimpleForm> forms = new UndoRedo<>();
 
@@ -41,34 +43,43 @@ public class FormManager {
 
     public static void showMenu() {
         instance.menuShowing = true;
-        instance.panelSlider.addSlide(instance.menu, SimpleTransition.getShowMenuTransition(instance.menu.getDrawerBuilder().getDrawerWidth(), instance.undecorated));
+        instance.panelSlider.addSlide(instance.menu,
+            SimpleTransition.getShowMenuTransition(
+                instance.menu.getDrawerBuilder().getDrawerWidth(),
+                instance.undecorated));
     }
-    
+
     public static void init() {
         Admin admin = AuthController.getSession();
         if (admin == null) {
             logout();
         } else {
             login(admin);
+            initPage.init();
         }
-        showForm(new DashboardPage());
+        showForm(initPage);
     }
 
     public static void showForm(SimpleForm component) {
         if (isNewFormAble()) {
-            if(instance.forms.getCurrent() != null && instance.forms.getCurrent().getClass().getSimpleName().equals(component.getClass().getSimpleName())){
+            if (instance.forms.getCurrent() != null && instance.forms.getCurrent().getClass().getSimpleName().equals(
+                component.getClass().getSimpleName())) {
                 instance.menuShowing = false;
                 Image oldImage = instance.panelSlider.createOldImage();
-                instance.panelSlider.addSlide(instance.mainForm, SimpleTransition.getSwitchFormTransition(oldImage, instance.menu.getDrawerBuilder().getDrawerWidth()));
+                instance.panelSlider.addSlide(instance.mainForm,
+                    SimpleTransition.getSwitchFormTransition(oldImage,
+                        instance.menu.getDrawerBuilder().getDrawerWidth()));
                 return;
             };
-            
+
             instance.forms.add(component);
             if (instance.menuShowing) {
                 instance.menuShowing = false;
                 Image oldImage = instance.panelSlider.createOldImage();
                 instance.mainForm.setForm(component);
-                instance.panelSlider.addSlide(instance.mainForm, SimpleTransition.getSwitchFormTransition(oldImage, instance.menu.getDrawerBuilder().getDrawerWidth()));
+                instance.panelSlider.addSlide(instance.mainForm,
+                    SimpleTransition.getSwitchFormTransition(oldImage,
+                        instance.menu.getDrawerBuilder().getDrawerWidth()));
             } else {
                 instance.mainForm.showForm(component);
             }
@@ -87,11 +98,12 @@ public class FormManager {
 
     public static void login(Admin admin) {
         FlatAnimatedLafChange.showSnapshot();
-        
+
         instance.frame.getContentPane().removeAll();
         instance.frame.getContentPane().add(instance.panelSlider);
         // set new user and rebuild menu for user role
         ((DrawerBuilder) instance.menu.getDrawerBuilder()).setAdmin(admin);
+        initPage.init();
         instance.frame.repaint();
         instance.frame.revalidate();
         FlatAnimatedLafChange.hideSnapshotWithAnimation();
@@ -99,13 +111,17 @@ public class FormManager {
 
     public static void hideMenu() {
         instance.menuShowing = false;
-        instance.panelSlider.addSlide(instance.mainForm, SimpleTransition.getHideMenuTransition(instance.menu.getDrawerBuilder().getDrawerWidth(), instance.undecorated));
+        instance.panelSlider.addSlide(instance.mainForm,
+            SimpleTransition.getHideMenuTransition(
+                instance.menu.getDrawerBuilder().getDrawerWidth(),
+                instance.undecorated));
     }
 
     public static void undo() {
         if (isNewFormAble()) {
             if (!instance.menuShowing && instance.forms.isUndoAble()) {
-                instance.mainForm.showForm(instance.forms.undo(), SimpleTransition.getDefaultTransition(true));
+                instance.mainForm.showForm(instance.forms.undo(),
+                    SimpleTransition.getDefaultTransition(true));
                 instance.forms.getCurrent().formOpen();
             }
         }

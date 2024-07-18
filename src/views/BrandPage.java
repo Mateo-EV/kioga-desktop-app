@@ -13,6 +13,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import models.Brand;
 import net.miginfocom.swing.MigLayout;
@@ -29,6 +30,7 @@ import ui.components.SimpleForm;
 import ui.table.CheckBoxTableHeaderRenderer;
 import ui.table.ImageTableRenderer;
 import ui.table.TableHeaderAlignment;
+import ui.table.TableImage;
 import utils.ApiClient;
 import utils.GlobalCacheState;
 import utils.structure.ArbolBinario;
@@ -39,7 +41,7 @@ import views.dialog.EditBrandForm;
 public class BrandPage extends SimpleForm {
 
     private final LoadingSkeleton loadingSkeleton;
-    private TableRowSorter rowSorter;
+    private static TableRowSorter rowSorter;
 
     public BrandPage() {
         initComponents();
@@ -97,7 +99,23 @@ public class BrandPage extends SimpleForm {
                 if (text.trim().length() == 0) {
                     rowSorter.setRowFilter(null);
                 } else {
-                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                    rowSorter.setRowFilter(
+                        new RowFilter<TableModel, Integer>() {
+                        @Override
+                        public boolean include(
+                            Entry<? extends TableModel, ? extends Integer> entry) {
+                            for (int i = 0; i < entry.getValueCount(); i++) {
+                                Object value = entry.getValue(i);
+                                if (value instanceof TableImage) {
+                                    return false;
+                                } else if (value != null && value.toString().toLowerCase().contains(
+                                    text.toLowerCase())) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                    });
                 }
             }
         });
@@ -145,7 +163,9 @@ public class BrandPage extends SimpleForm {
 
     public static void syncBrands() {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        table.setRowSorter(null);
         tableModel.setRowCount(0);
+        table.setRowSorter(rowSorter);
         GlobalCacheState.getBrands().forEach(a -> {
             addProductToTable(a);
         });
@@ -279,7 +299,7 @@ public class BrandPage extends SimpleForm {
             table.getColumnModel().getColumn(0).setMaxWidth(50);
             table.getColumnModel().getColumn(1).setMaxWidth(50);
             table.getColumnModel().getColumn(2).setPreferredWidth(150);
-            table.getColumnModel().getColumn(3).setPreferredWidth(100);
+            table.getColumnModel().getColumn(3).setPreferredWidth(150);
             table.getColumnModel().getColumn(4).setPreferredWidth(150);
             table.getColumnModel().getColumn(5).setPreferredWidth(150);
             table.getColumnModel().getColumn(6).setPreferredWidth(0);

@@ -24,8 +24,10 @@ import raven.drawer.component.menu.SimpleMenuStyle;
 import raven.drawer.component.menu.data.Item;
 import raven.drawer.component.menu.data.MenuItem;
 import raven.swing.AvatarIcon;
+import views.AdminPage;
 import views.BrandPage;
 import views.CategoryPage;
+import views.CustomerPage;
 import views.DashboardPage;
 import views.OrderPage;
 import views.ProductPage;
@@ -105,6 +107,7 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
             new Item("Marcas", "square-menu.svg"),
             new Item("Clientes", "users.svg"),
             new Item.Label("OTROS"),
+            new Item("Administradores", "lock.svg"),
             new Item("Logout", "logout.svg")
         };
 
@@ -185,7 +188,7 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
                 if (index.length == 1) {
                     switch (index[0]) {
                         case 0:
-                            FormManager.showForm(new DashboardPage());
+                            FormManager.showForm(new DashboardPage(true));
                             break;
                         case 1:
                             FormManager.showForm(new OrderPage());
@@ -199,7 +202,13 @@ public class DrawerBuilder extends SimpleDrawerBuilder {
                         case 4:
                             FormManager.showForm(new BrandPage());
                             break;
+                        case 5:
+                            FormManager.showForm(new CustomerPage());
+                            break;
                         case 6:
+                            FormManager.showForm(new AdminPage());
+                            break;
+                        case 7:
                             AuthController.logout();
                             FormManager.logout();
                             break;

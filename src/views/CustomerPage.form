@@ -96,7 +96,7 @@
                     <Column editable="true" title="SELECT" type="java.lang.Boolean"/>
                     <Column editable="false" title="#" type="java.lang.Object"/>
                     <Column editable="false" title="NOMBRE" type="java.lang.Object"/>
-                    <Column editable="false" title="IMAGEN" type="java.lang.Object"/>
+                    <Column editable="false" title="EMAIL" type="java.lang.Object"/>
                     <Column editable="false" title="CREADO" type="java.lang.Object"/>
                     <Column editable="false" title="ACTUALIZADO" type="java.lang.Object"/>
                     <Column editable="false" title="" type="java.lang.Object"/>
@@ -157,7 +157,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="lbTitle">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Marcas"/>
+            <Property name="text" type="java.lang.String" value="Clientes"/>
           </Properties>
         </Component>
         <Component class="ui.components.ActionButton" name="btnDelete">

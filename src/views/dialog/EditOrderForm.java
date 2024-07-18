@@ -723,7 +723,7 @@ public class EditOrderForm extends javax.swing.JPanel {
             addressesModel.addElement(address);
         });
 
-        if (orderLoaded.getCustomer() != null && customer.getId() == orderLoaded.getCustomer().getId()) {
+        if (orderLoaded != null && orderLoaded.getCustomer() != null && customer.getId() == orderLoaded.getCustomer().getId()) {
             selectItemById(cbAddresses, orderLoaded.getAddress().getId());
         }
     }//GEN-LAST:event_cbCustomersActionPerformed

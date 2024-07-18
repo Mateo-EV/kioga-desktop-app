@@ -13,6 +13,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import models.Category;
 import net.miginfocom.swing.MigLayout;
@@ -29,6 +30,7 @@ import ui.components.SimpleForm;
 import ui.table.CheckBoxTableHeaderRenderer;
 import ui.table.ImageTableRenderer;
 import ui.table.TableHeaderAlignment;
+import ui.table.TableImage;
 import utils.ApiClient;
 import utils.GlobalCacheState;
 import utils.structure.ArbolBinario;
@@ -39,7 +41,7 @@ import views.dialog.EditCategoryForm;
 public class CategoryPage extends SimpleForm {
 
     private final LoadingSkeleton loadingSkeleton;
-    private TableRowSorter rowSorter;
+    private static TableRowSorter rowSorter;
 
     public CategoryPage() {
         initComponents();
@@ -97,7 +99,23 @@ public class CategoryPage extends SimpleForm {
                 if (text.trim().length() == 0) {
                     rowSorter.setRowFilter(null);
                 } else {
-                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+                    rowSorter.setRowFilter(
+                        new RowFilter<TableModel, Integer>() {
+                        @Override
+                        public boolean include(
+                            Entry<? extends TableModel, ? extends Integer> entry) {
+                            for (int i = 0; i < entry.getValueCount(); i++) {
+                                Object value = entry.getValue(i);
+                                if (value instanceof TableImage) {
+                                    return false;
+                                } else if (value != null && value.toString().toLowerCase().contains(
+                                    text.toLowerCase())) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                    });
                 }
             }
         });
@@ -145,7 +163,9 @@ public class CategoryPage extends SimpleForm {
 
     public static void syncCategories() {
         DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+        table.setRowSorter(null);
         tableModel.setRowCount(0);
+        table.setRowSorter(rowSorter);
         GlobalCacheState.getCategories().forEach(category -> {
             addProductToTable(category);
         });

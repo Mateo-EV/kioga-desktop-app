@@ -55,6 +55,10 @@ public class Customer extends TimeStamps implements Identifiable {
         this.email = email;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }

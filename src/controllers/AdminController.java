@@ -7,6 +7,7 @@ package controllers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import models.Admin;
 import models.Customer;
 import utils.ApiClient;
 import utils.BackgroundSwingWorker;
@@ -17,26 +18,26 @@ import utils.structure.ArbolBinario;
  *
  * @author intel
  */
-public class CustomerController implements ModelController<Customer> {
+public class AdminController implements ModelController<Admin> {
 
-    private static final CustomerController instance = new CustomerController();
+    private static final AdminController instance = new AdminController();
 
-    public static CustomerController getInstance() {
+    public static AdminController getInstance() {
         return instance;
     }
 
-    static public Customer transcriptCustomer(Map<String, Object> customerMap) {
-        Customer customer = new Customer(
+    static public Admin transcriptAdmin(Map<String, Object> customerMap) {
+        Admin admin = new Admin(
             ((Number) customerMap.get("id")).intValue(),
             (String) customerMap.get("name"),
             (String) customerMap.get("email")
         );
-        customer.setCreatedAtFromTimeStamp((String) customerMap.get(
+        admin.setCreatedAtFromTimeStamp((String) customerMap.get(
             "created_at"));
-        customer.setUpdatedAtFromTimeStamp((String) customerMap.get(
+        admin.setUpdatedAtFromTimeStamp((String) customerMap.get(
             "updated_at"));
 
-        return customer;
+        return admin;
     }
 
     @Override
@@ -52,7 +53,7 @@ public class CustomerController implements ModelController<Customer> {
         }
 
         new BackgroundSwingWorker(
-            "/admin/users/" + id,
+            "/admin/manage/" + id,
             "GET",
             null,
             new ApiClient.onResponse() {
@@ -60,14 +61,14 @@ public class CustomerController implements ModelController<Customer> {
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 Map<String, Object> categoryMap = (Map<String, Object>) apiResponse.getData();
 
-                Customer customer = transcriptCustomer(categoryMap);
+                Admin admin = transcriptAdmin(categoryMap);
 
-                GlobalCacheState.getCustomers().update(customer);
+                GlobalCacheState.getAdmins().update(admin);
 
                 onResponse.onSuccess(new ApiClient.ApiResponse(
                     ApiClient.ResponseType.SUCCESS,
                     null,
-                    customer
+                    admin
                 ));
             }
 
@@ -82,31 +83,31 @@ public class CustomerController implements ModelController<Customer> {
 
     @Override
     public void findAll(ApiClient.onResponse onResponse) {
-        if (!GlobalCacheState.getCustomers().isEmpty()) {
+        if (!GlobalCacheState.getAdmins().isEmpty()) {
             onResponse.onSuccess(new ApiClient.ApiResponse(
                 ApiClient.ResponseType.SUCCESS,
                 null,
-                GlobalCacheState.getCategories()
+                GlobalCacheState.getAdmins()
             ));
             return;
         }
 
         new BackgroundSwingWorker(
-            "/admin/users",
+            "/admin/manage",
             "GET",
             null,
             new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
-                List<Map<String, Object>> customersMap = (List<Map<String, Object>>) apiResponse.getData();
-                ArbolBinario<Customer> customers = GlobalCacheState.getCustomers();
-                for (Map<String, Object> customerMap : customersMap) {
-                    customers.insert(transcriptCustomer(customerMap));
+                List<Map<String, Object>> adminsMap = (List<Map<String, Object>>) apiResponse.getData();
+                ArbolBinario<Admin> admins = GlobalCacheState.getAdmins();
+                for (Map<String, Object> adminMap : adminsMap) {
+                    admins.insert(transcriptAdmin(adminMap));
                 }
                 onResponse.onSuccess(new ApiClient.ApiResponse(
                     ApiClient.ResponseType.SUCCESS,
                     null,
-                    customers
+                    admins
                 ));
             }
 
@@ -120,21 +121,21 @@ public class CustomerController implements ModelController<Customer> {
     }
 
     @Override
-    public void save(Customer customer, ApiClient.onResponse onResponse) {
+    public void save(Admin customer, ApiClient.onResponse onResponse) {
         Map<String, Object> customerMap = new HashMap();
         customerMap.put("name", customer.getName());
         customerMap.put("email", customer.getEmail());
         customerMap.put("password", customer.getPassword());
 
-        new BackgroundSwingWorker("/admin/users", "POST", customerMap,
+        new BackgroundSwingWorker("/admin/manage", "POST", customerMap,
             new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 Map<String, Object> categoryMap = (Map<String, Object>) apiResponse.getData();
 
-                GlobalCacheState.getCustomers().insert(transcriptCustomer(
+                GlobalCacheState.getAdmins().insert(transcriptAdmin(
                     categoryMap));
-                GlobalCacheState.syncCustomers();
+                GlobalCacheState.syncAdmins();
 
                 onResponse.onSuccess(new ApiClient.ApiResponse(
                     ApiClient.ResponseType.SUCCESS,
@@ -151,13 +152,13 @@ public class CustomerController implements ModelController<Customer> {
     }
 
     @Override
-    public void update(Customer customer, ApiClient.onResponse onResponse) {
+    public void update(Admin customer, ApiClient.onResponse onResponse) {
         Map<String, Object> customerMap = new HashMap<>();
         customerMap.put("name", customer.getName());
         customerMap.put("email", customer.getEmail());
         customerMap.put("password", customer.getPassword());
 
-        new BackgroundSwingWorker("/admin/users/" + customer.getId(),
+        new BackgroundSwingWorker("/admin/manage/" + customer.getId(),
             "PUT",
             customerMap,
             new ApiClient.onResponse() {
@@ -165,9 +166,9 @@ public class CustomerController implements ModelController<Customer> {
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
                 Map<String, Object> categoryMap = (Map<String, Object>) apiResponse.getData();
 
-                GlobalCacheState.getCustomers().update(transcriptCustomer(
+                GlobalCacheState.getAdmins().update(transcriptAdmin(
                     categoryMap));
-                GlobalCacheState.syncCustomers();
+                GlobalCacheState.syncAdmins();
 
                 onResponse.onSuccess(new ApiClient.ApiResponse(
                     ApiClient.ResponseType.SUCCESS,
@@ -185,13 +186,13 @@ public class CustomerController implements ModelController<Customer> {
 
     @Override
     public void delete(int id, ApiClient.onResponse onResponse) {
-        new BackgroundSwingWorker("/admin/users/" + id, "DELETE",
+        new BackgroundSwingWorker("/admin/manage/" + id, "DELETE",
             null,
             new ApiClient.onResponse() {
             @Override
             public void onSuccess(ApiClient.ApiResponse apiResponse) {
-                GlobalCacheState.getCustomers().delete(id);
-                GlobalCacheState.syncCustomers();
+                GlobalCacheState.getAdmins().delete(id);
+                GlobalCacheState.syncAdmins();
 
                 onResponse.onSuccess(new ApiClient.ApiResponse(
                     ApiClient.ResponseType.SUCCESS,

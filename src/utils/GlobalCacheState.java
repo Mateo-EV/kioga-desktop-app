@@ -3,6 +3,7 @@ package utils;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
+import models.Admin;
 import models.Brand;
 import models.Category;
 import models.Customer;
@@ -11,6 +12,7 @@ import models.Product;
 import utils.structure.ArbolBinario;
 import views.BrandPage;
 import views.CategoryPage;
+import views.CustomerPage;
 import views.OrderPage;
 import views.ProductPage;
 import views.dialog.CreateOrderForm;
@@ -22,6 +24,7 @@ public class GlobalCacheState {
     final static protected ArbolBinario<Product> products = new ArbolBinario();
     final static protected ArbolBinario<Category> categories = new ArbolBinario();
     final static protected ArbolBinario<Brand> brands = new ArbolBinario();
+    final static protected ArbolBinario<Admin> admins = new ArbolBinario();
 
     final static protected Map<String, ImageIcon> images = new HashMap<>();
 
@@ -45,6 +48,10 @@ public class GlobalCacheState {
         return brands;
     }
 
+    public static ArbolBinario<Admin> getAdmins() {
+        return admins;
+    }
+
     public static Map<String, ImageIcon> getImages() {
         return images;
     }
@@ -60,6 +67,7 @@ public class GlobalCacheState {
 
     static public void syncCustomers() {
         CreateOrderForm.syncCustomers();
+        CustomerPage.syncCustomers();
     }
 
     static public void syncCategories() {
@@ -68,5 +76,9 @@ public class GlobalCacheState {
 
     static public void syncBrands() {
         BrandPage.syncBrands();
+    }
+
+    static public void syncAdmins() {
+
     }
 }
